@@ -6,13 +6,21 @@ import java.util.regex.Pattern;
 
 public class Router {
 
-	private final File routePath;
+	public static final String RootPath = "/";
 	
-	public Router(File routePath) {
+	private final File routePath;
+	private final String rootMapToPath;
+	
+	public Router(File routePath, String rootMapToPath) {
 		this.routePath = routePath;
+		this.rootMapToPath = rootMapToPath;
 	}
 	
 	public FileGenerator getFileGenerator(String absolutePath) {
+		
+		if(absolutePath.equals(RootPath)) {
+			absolutePath = rootMapToPath;
+		}
 		String targetPath = normalizePath(absolutePath);
 		String extensionName = getExtensionName(absolutePath);
 		String pathCells[] = targetPath.split("/");
