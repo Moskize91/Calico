@@ -6,7 +6,6 @@ import java.io.Reader;
 abstract class AllowFillReader extends Reader {
 
 	private String fillContent = null;
-	private boolean isClosed = false;
 	private int nextIndex = 0;
 	
 	protected abstract int readOneChar() throws IOException ;
@@ -25,14 +24,8 @@ abstract class AllowFillReader extends Reader {
 	}
 	
 	private int readOneCharConsiderFillContent() throws IOException {
-		if(isClosed) {
-			return -1;
-		}
 		if(fillContent == null) {
 			int ch = readOneChar();
-			if(ch < 0) {
-				isClosed = true;
-			}
 			return ch;
 			
 		} else {

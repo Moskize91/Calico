@@ -10,6 +10,7 @@ class StringEscapeReader extends AllowFillReader {
 	@SuppressWarnings("serial")
 	private static Map<Character, String> escapeMap = new HashMap<Character, String>(){{
 		put('\n', "n");
+		put('\r', "r");
 		put('\t', "t");
 		put('\b', "b");
 		put('\\', "\\");
@@ -19,6 +20,8 @@ class StringEscapeReader extends AllowFillReader {
 	
 	private final Reader reader;
 	private boolean escapeFlag = false;
+	
+	private int realReadCharCount = 0;
 	
 	StringEscapeReader(Reader reader) {
 		this.reader = reader;
@@ -32,6 +35,10 @@ class StringEscapeReader extends AllowFillReader {
 		this.escapeFlag = escapeFlag;
 	}
 
+	private void fillContentButNeverEscape(String content) {
+		super.fillContent(content);
+	}
+	
 	@Override
 	protected void fillContent(String content) {
 		String fillContent;
@@ -40,7 +47,7 @@ class StringEscapeReader extends AllowFillReader {
 		} else {
 			fillContent = content;
 		}
-		super.fillContent(fillContent);
+		fillContentButNeverEscape(fillContent);
 	}
 
 	private String escapeString(String content) {
@@ -60,13 +67,14 @@ class StringEscapeReader extends AllowFillReader {
 	@Override
 	protected int readOneChar() throws IOException {
 		int ch = reader.read();
+		realReadCharCount++;
 		if(ch < 0) {
 			return ch;
 		}
 		if(escapeFlag) {
 			if(escapeMap.containsKey((char) ch)) {
+				fillContentButNeverEscape(escapeMap.get((char) ch));
 				ch = '\\';
-				fillContent(escapeMap.get((char) ch));
 			}
 		}
 		return ch;
@@ -75,5 +83,13 @@ class StringEscapeReader extends AllowFillReader {
 	@Override
 	public void close() throws IOException {
 		reader.close();
+	}
+
+	public int getRealReadCharCount() {
+		return realReadCharCount;
+	}
+	
+	public void resetRealReadCharCount() {
+		realReadCharCount = 0;
 	}
 }

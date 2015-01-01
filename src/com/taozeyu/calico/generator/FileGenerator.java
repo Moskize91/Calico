@@ -66,7 +66,7 @@ public class FileGenerator {
 		
 		try {
 		    jse.getContext().setWriter(writer);
-		    jse.eval(reader);
+		    jse.eval(getFileContentFromReader(reader));
 		    
 		} finally {
 			writer.flush();
@@ -75,9 +75,19 @@ public class FileGenerator {
 		}
 	}
 	
+	//很遗憾，Nashorn 从很长的流中读取代码会遗漏一部分，但是将其缓存成 String 传入再读却完全没有问题。 
+	//目前不知道为什么。
+	private String getFileContentFromReader(Reader reader) throws IOException {
+	    StringBuilder sb = new StringBuilder();
+	    for(int ch = reader.read(); ch >= 0; ch = reader.read()) {
+	    	sb.append((char) ch);
+	    }
+	    return sb.toString();
+	}
+	
 	private Writer getTargetFileWriter(File targetDir) throws FileNotFoundException {
 		File targetFile = getTargetFile(targetDir);
-		targetFile.mkdirs();
+		targetFile.getParentFile().mkdirs();
 		
 		Writer writer = new OutputStreamWriter(
 				new FileOutputStream(targetFile),
@@ -144,8 +154,7 @@ public class FileGenerator {
 		return pageLinkList;
 	}
 
-	private Document getDocumentFromTargetFIle(File targetDir)
-			throws IOException {
+	private Document getDocumentFromTargetFIle(File targetDir) throws IOException {
 		File targetFile = getTargetFile(targetDir);
 		String charsetName = GlobalConifg.instance.getCharset().name();
 		Document doc = Jsoup.parse(targetFile, charsetName);
