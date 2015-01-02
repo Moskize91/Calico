@@ -13,7 +13,7 @@ Calico 会假装自己是一个动态 Web 服务器，虽然它最终只能生�
 
 	Routes 规则仅仅由 Template 文件的命名和相对项目的路径来决定。
 
-	特别的，如果对于某个请求，刚好有一个路径和名称与之完全相同的 Template 文件存在，则这个 Template 将处理这个请求。例如，为 /about.html，且刚好存在一个 Template文件，为 /about.html。
+	特别的，如果对于某个请求，刚好有一个路径和名称与之完全相同的 Template 文件存在，则这个 Template 将处理这个请求。例如，对于 /about.html，刚好存在一个 Template文件，为 /about.html。
 
 2.	Template 中内嵌的用 JavaScript 的小脚本与 HTML 内容将最终生成目标 HTML 文件。这个目标文件所存储的地址将和请求的地址完全相同。例如，/article/log/2015-01-02-hello-world.html 最终生成的文件也会存储在 /article/log/2015-01-02-hello-world.html。
 
