@@ -40,9 +40,9 @@ public class Router {
 
 	private String getExtensionName(String path) {
 		String extensionName;
-		Matcher matcher = Pattern.compile("\\.\\w+$").matcher(path);
+		Matcher matcher = Pattern.compile("\\.(\\w|\\-)+$").matcher(path);
 		if(matcher.find()) {
-			extensionName = matcher.group().replace("^\\.", "");
+			extensionName = matcher.group().replaceAll("^\\.", "");
 		} else {
 			extensionName = "html";
 		}
@@ -54,7 +54,7 @@ public class Router {
 	}
 
 	private String normalizePath(String absolutePath) {
-		return absolutePath.replaceAll("\\\\", "/").replace("(\\.\\w+)?/$", "");
+		return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+)?/$", "");
 	}
 	
 	private FileGenerator createFileGenerator(String absolutePath, String[] pathCells, String extensionName) {
@@ -79,15 +79,15 @@ public class Router {
 	}
 
 	private int findEndOfExistDirIndex(String[] pathCells) {
-		int endOfExistDirIndex = 0;
+		int endOfExistDirIndex = -1;
 		File path = new File("");
 		for(int i=0; i<pathCells.length; ++i) {
-			endOfExistDirIndex = i;
 			String pathCell = pathCells[i];
 			path = new File(path, pathCell);
 			if(isFileExist(path)) {
 				break;
 			}
+			endOfExistDirIndex = i;
 		}
 		return endOfExistDirIndex;
 	}

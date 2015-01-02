@@ -16,7 +16,7 @@ import com.taozeyu.calico.generator.Router;
 
 class ContentBuilder {
 
-	private static final Pattern UrlWithDomain = Pattern.compile("^(http|https)://\\w+(\\.\\w+)*(:\\d+)?");
+	private static final Pattern UrlWithDomain = Pattern.compile("^(http|https)://(\\w|\\-)+(\\.(\\w+|\\-))*(:\\d+)?");
 	
 	private final Router router;
 	private final File targetDir;
@@ -35,9 +35,7 @@ class ContentBuilder {
 			String path = getPathFromQueue();
 			FileGenerator generator = router.getFileGenerator(path);
 			List<String> linkList = generator.generateAndGetPageLinkList(targetDir);
-			System.out.println();
 			for(String linkPath: linkList) {
-				System.out.println(linkPath);
 				handleLinkPath(path, linkPath);
 			}
 		}
@@ -59,7 +57,7 @@ class ContentBuilder {
 	}
 
 	private String clearTailFileName(String currentPagePath) {
-		return currentPagePath.replaceAll("\\w+(\\.\\w+)*/?$", "");
+		return currentPagePath.replaceAll("(\\w|\\-)+(\\.(\\w|\\-)+)*/?$", "");
 	}
 
 	private void findPathAndTryAddToQueue(String path) {

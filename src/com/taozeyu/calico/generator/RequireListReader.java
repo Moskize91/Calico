@@ -16,7 +16,7 @@ import com.taozeyu.calico.GlobalConifg;
 class RequireListReader extends AllowFillReader {
 
 	private static final int BufferedSize = 1024;
-	private static final Pattern RequirePattern = Pattern.compile("^/?(\\w|_|\\.)+(/(\\w|_|\\.)+)*$");
+	private static final Pattern RequirePattern = Pattern.compile("^/?(\\w|\\-|\\.)+(/(\\w|\\-|\\.)+)*$");
 	
 	private final Reader reader;
 	private final RequireListReader parent;

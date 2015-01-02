@@ -57,7 +57,7 @@ public class FileGenerator {
 			loadEveryScriptLiberary(engine);
 	    } catch (ScriptException e) {
 	    	e.printStackTrace();
-	    	System.exit(1);
+	    	System.exit(1); //标准库出问题，只能退出。
 	    }
 		return engine;
 	}
@@ -150,7 +150,8 @@ public class FileGenerator {
 	private List<String> createPageLinkList(File targetDir) throws IOException {
 		Document doc = getDocumentFromTargetFIle(targetDir);
 		List<String> pageLinkList = new LinkedList<String>();
-		for(Element link:doc.select("a[href~=.+\\.html?$]")) {
+		
+		for(Element link:doc.select("a[href~=^.+\\.html?$]")) {
 			pageLinkList.add(link.attr("href"));
 		}
 		return pageLinkList;
