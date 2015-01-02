@@ -29,7 +29,7 @@ public class Router {
 		File targetPathTemplateFile = new File(routePath, targetPath);
 		if(targetPathTemplateFile.exists()) {
 			String params = "";
-			return new FileGenerator(new File(targetPath), targetPathTemplateFile, params);
+			return new FileGenerator(new File(targetPath), targetPathTemplateFile, routePath, params);
 			
 		} else {
 			String extensionName = getExtensionName(targetPath);
@@ -64,7 +64,7 @@ public class Router {
 		File templatePath = getTemplatePath(path, extensionName);
 		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
 		checkTemplatePath(templatePath); 
-		return new FileGenerator(new File(absolutePath), templatePath, params);
+		return new FileGenerator(new File(absolutePath), templatePath, routePath, params);
 	}
 
 	private String getTemplateDirPath(String[] pathCells, int endOfExistDirIndex) {

@@ -35,7 +35,9 @@ class ContentBuilder {
 			String path = getPathFromQueue();
 			FileGenerator generator = router.getFileGenerator(path);
 			List<String> linkList = generator.generateAndGetPageLinkList(targetDir);
+			System.out.println();
 			for(String linkPath: linkList) {
+				System.out.println(linkPath);
 				handleLinkPath(path, linkPath);
 			}
 		}

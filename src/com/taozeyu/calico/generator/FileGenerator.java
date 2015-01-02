@@ -34,11 +34,13 @@ public class FileGenerator {
 	
 	private final File absolutePath;
 	private final File templatePath;
+	private final File routeDir;
 	private final String params;
 	
-	FileGenerator(File absolutePath, File templatePath, String params) {
+	FileGenerator(File absolutePath, File templatePath, File routeDir, String params) {
 		this.absolutePath = absolutePath;
 		this.templatePath = templatePath;
+		this.routeDir = routeDir;
 		this.params = params;
 	}
 
@@ -100,8 +102,8 @@ public class FileGenerator {
 		return new File(targetDir, absolutePath.getPath());
 	}
 
-	private Reader getTemplateReader() throws FileNotFoundException {
-		Reader reader = getReaderFromFile(templatePath, GlobalConifg.instance.getCharset());
+	private Reader getTemplateReader() throws IOException {
+		Reader reader = new RequireListReader(templatePath, routeDir);
 		return new HtmlTemplateReader(reader);
 	}
 
