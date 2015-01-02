@@ -9,13 +9,17 @@ public class ResourceManager {
 	private final File sourceDir;
 	private ResourceManager[] dirs = null;
 	
+	private static final String ResourceTemplateExtensionNames[] = new String[] {
+		"md", "html", "htm"
+	};
+	
 	public ResourceManager(File sourceDir) {
 		this.sourceDir = sourceDir;
 	}
 
 	public AbstractPageResource page(String path) {
-		File pageFile = new File(sourceDir.getPath(), path);
-		if(!pageFile.exists() || !pageFile.isFile()) {
+		File pageFile = getPageFile(path);
+		if(pageFile == null) {
 			return null;
 		}
 		switch(getExtensionName(pageFile)) {
@@ -33,6 +37,27 @@ public class ResourceManager {
 		}
 	}
 
+	private File getPageFile(String path) {
+		path = clearExtensionName(path);
+		File pageFile = null;
+		boolean hasFound = false;
+		for(String extensionName:ResourceTemplateExtensionNames) {
+			File file = new File(sourceDir.getPath(), path + "." + extensionName);
+			if(file.exists() && file.isFile()) {
+				if(hasFound) {
+					throw new ResourceException("there are 2 file named '" + path + "'.");
+				}
+				hasFound = true;
+				pageFile = file;
+			}
+		}
+		return pageFile;
+	}
+
+	private String clearExtensionName(String path) {
+		return path.replaceAll("\\.(\\w|\\-)+$", "");
+	}
+	
 	private String getExtensionName(File pageFile) {
 		String name = pageFile.getName();
 		return name.substring(name.lastIndexOf('.') + 1);
