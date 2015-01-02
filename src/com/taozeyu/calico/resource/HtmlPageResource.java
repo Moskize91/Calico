@@ -11,7 +11,7 @@ class HtmlPageResource extends AbstractPageResource {
 	}
 
 	@Override
-	public String getPageContent() throws IOException {
+	public String getContent() throws IOException {
 		Reader reader = createResourceFileReaderBuyJumpOverHead();
 		try {
 			return getStringFromReader(reader);

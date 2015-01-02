@@ -10,7 +10,7 @@ public abstract class AbstractPageResource extends ResourceFileWithHead {
 		super(resourceFile);
 	}
 
-	public abstract String getPageContent() throws IOException;
+	public abstract String getContent() throws IOException;
 	
 	protected String getStringFromReader(Reader reader) throws IOException {
 		StringBuilder sb = new StringBuilder();
