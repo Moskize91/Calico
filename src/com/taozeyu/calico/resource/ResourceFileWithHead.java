@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.taozeyu.calico.GlobalConifg;
+
 public class ResourceFileWithHead {
 
 	private static final Pattern HeadLinePattern = Pattern.compile("^(\\w|\\-)+\\s*:\\w*(\\w|\\-)+$");
@@ -84,7 +86,7 @@ public class ResourceFileWithHead {
 	private Reader createResourceFileReader() throws FileNotFoundException {
 		InputStream inputStream = new FileInputStream(resourceFile);
 		inputStream = new BufferedInputStream(inputStream, ReadAttributeBufferedSize);
-		return new InputStreamReader(inputStream);
+		return new InputStreamReader(inputStream, GlobalConifg.instance.getCharset());
 	}
 	
 	private void collectLineMessageIntoAttributes(Map<String, String> attributeMap, String line) {

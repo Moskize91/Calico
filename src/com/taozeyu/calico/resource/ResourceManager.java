@@ -13,6 +13,31 @@ public class ResourceManager {
 		this.sourceDir = sourceDir;
 	}
 
+	public AbstractPageResource page(String path) {
+		File pageFile = new File(sourceDir.getPath(), path);
+		if(!pageFile.exists() || !pageFile.isFile()) {
+			return null;
+		}
+		switch(getExtensionName(pageFile)) {
+		case "md":
+			return new MarkdownPageResource(pageFile);
+			
+		case "html":
+			return new HtmlPageResource(pageFile);
+			
+		case "htm":
+			return new HtmlPageResource(pageFile);
+			
+		default:
+			return null;
+		}
+	}
+
+	private String getExtensionName(File pageFile) {
+		String name = pageFile.getName();
+		return name.substring(name.lastIndexOf('.') + 1);
+	}
+	
 	public ResourceManager dir(String path) {
 		File dir = new File(sourceDir.getPath(), path);
 		if(!dir.exists() && !dir.isDirectory()) {
