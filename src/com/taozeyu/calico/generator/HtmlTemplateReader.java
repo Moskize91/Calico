@@ -27,6 +27,15 @@ class HtmlTemplateReader extends AllowFillReader {
 	}
 	
 	@Override
+	public int read(char[] cbuf, int off, int len) throws IOException {
+		int rsCode = super.read(cbuf, off, len);
+//		for(int i=0; i<len; ++i) {
+//			System.out.print(cbuf[off + i]);
+//		}
+		return rsCode;
+	}
+
+	@Override
 	protected int readOneChar() throws IOException {
 		int ch = reader.read();
 		if(ch < 0) {
@@ -64,17 +73,17 @@ class HtmlTemplateReader extends AllowFillReader {
 	}
 
 	private int handleCharWhenIsContent(int ch) throws IOException {
+		
 		if(ch == '<' && (ch = reader.read()) >= 0) {
-			if(isReadNumOverLimit()) {
-				createNewPrintLine();
-				
-			} else if(ch == '%' && (ch = reader.read()) >= 0) {
+			if(ch == '%' && (ch = reader.read()) >= 0) {
 				ch = gotoScriptState(ch);
 				
 			} else {
 				reader.fillChar((char) ch);
 				ch = '<';
 			}
+		} else if(isReadNumOverLimit()) {
+			createNewPrintLine();
 		}
 		return ch;
 	}
