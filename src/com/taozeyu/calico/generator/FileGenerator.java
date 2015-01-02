@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import com.taozeyu.calico.GlobalConifg;
+import com.taozeyu.calico.resource.ResourceManager;
 
 public class FileGenerator {
 
@@ -32,12 +33,15 @@ public class FileGenerator {
 	private static final String LiberaryPath = "javascript";
 	private static final Charset LiberaryCharset = Charset.forName("UTF-8");
 	
+	private final ResourceManager resource;
+	
 	private final File absolutePath;
 	private final File templatePath;
 	private final File routeDir;
 	private final String params;
 	
-	FileGenerator(File absolutePath, File templatePath, File routeDir, String params) {
+	FileGenerator(ResourceManager resource, File absolutePath, File templatePath, File routeDir, String params) {
+		this.resource = resource;
 		this.absolutePath = absolutePath;
 		this.templatePath = templatePath;
 		this.routeDir = routeDir;
@@ -120,6 +124,7 @@ public class FileGenerator {
 	private void loadScriptLiberary(ScriptEngine engine, File file) throws ScriptException, IOException {
 		Reader reader = getReaderFromFile(file, LiberaryCharset);
 		try {
+			engine.put("R", resource);
 			engine.getContext().setWriter(new OutputStreamWriter(System.out, LiberaryCharset));
 			engine.getContext().setErrorWriter(new OutputStreamWriter(System.err, LiberaryCharset));
 			engine.eval(reader);

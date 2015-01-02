@@ -4,15 +4,19 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.taozeyu.calico.resource.ResourceManager;
+
 public class Router {
 
 	public static final String RootPath = "/";
-	
-	private final File routePath;
+
+	private final ResourceManager resource;
+	private final File templatePath;
 	private final String rootMapToPath;
 	
-	public Router(File routePath, String rootMapToPath) {
-		this.routePath = routePath;
+	public Router(ResourceManager resource, File templatePath, String rootMapToPath) {
+		this.resource = resource;
+		this.templatePath = templatePath;
 		this.rootMapToPath = rootMapToPath;
 	}
 	
@@ -26,10 +30,10 @@ public class Router {
 	}
 
 	private FileGenerator useAbsoluteTemplateOrUseParams(String targetPath) {
-		File targetPathTemplateFile = new File(routePath, targetPath);
+		File targetPathTemplateFile = new File(templatePath, targetPath);
 		if(targetPathTemplateFile.exists()) {
 			String params = "";
-			return new FileGenerator(new File(targetPath), targetPathTemplateFile, routePath, params);
+			return new FileGenerator(resource, new File(targetPath), targetPathTemplateFile, templatePath, params);
 			
 		} else {
 			String extensionName = getExtensionName(targetPath);
@@ -64,7 +68,7 @@ public class Router {
 		File templatePath = getTemplatePath(path, extensionName);
 		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
 		checkTemplatePath(templatePath); 
-		return new FileGenerator(new File(absolutePath), templatePath, routePath, params);
+		return new FileGenerator(resource, new File(absolutePath), templatePath, templatePath, params);
 	}
 
 	private String getTemplateDirPath(String[] pathCells, int endOfExistDirIndex) {
@@ -93,7 +97,7 @@ public class Router {
 	}
 
 	private boolean isFileExist(File path) {
-		return new File(routePath.getPath(), path.getPath()).exists();
+		return new File(templatePath.getPath(), path.getPath()).exists();
 	}
 
 	private String selectParamsFromPath(String pathCells[], int startIndex) {
@@ -114,6 +118,6 @@ public class Router {
 	}
 
 	private File getTemplatePath(String dirPath, String extensionName) {
-		return new File(routePath.getPath(), dirPath + "." + extensionName);
+		return new File(templatePath.getPath(), dirPath + "." + extensionName);
 	}
 }
