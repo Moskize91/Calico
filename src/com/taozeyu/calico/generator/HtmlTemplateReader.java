@@ -8,8 +8,11 @@ class HtmlTemplateReader extends AllowFillReader {
 	// Nashorn 似乎对于 JavaScript 代码每一行字符数有限制（超出后将忽视），因此必须将过长的 print 语句拆成多行。
 	private static final int PrintCharNumLimit = 500;
 	
-	private static final String PrintHead = "print('";
-	private static final String PrintTail = "');\n";
+	private static final String PrintStringHead = "print('";
+	private static final String PrintStringTail = "');\n";
+	
+	private static final String PrintExpressionHead = "print(";
+	private static final String PrintExpressionTail = ");\n";
 	
 	private final StringEscapeReader reader;
 	private State state = State.Content;
@@ -22,17 +25,8 @@ class HtmlTemplateReader extends AllowFillReader {
 	
 	HtmlTemplateReader(Reader reader) {
 		this.reader = new StringEscapeReader(reader);
-		this.reader.fillContent(PrintHead);
+		this.reader.fillContent(PrintStringHead);
 		this.reader.setEscapeFlag(true);
-	}
-	
-	@Override
-	public int read(char[] cbuf, int off, int len) throws IOException {
-		int rsCode = super.read(cbuf, off, len);
-//		for(int i=0; i<len; ++i) {
-//			System.out.print(cbuf[off + i]);
-//		}
-		return rsCode;
 	}
 
 	@Override
@@ -64,7 +58,7 @@ class HtmlTemplateReader extends AllowFillReader {
 				throw new IOException();
 			}
 			reader.setEscapeFlag(false);
-			reader.fillContent(PrintTail);
+			reader.fillContent(PrintStringTail);
 			ch = reader.read();
 			
 			hasPrintTail = true;
@@ -101,9 +95,10 @@ class HtmlTemplateReader extends AllowFillReader {
 
 	private int gotoScriptState(int ch) throws IOException {
 		reader.setEscapeFlag(false);
-		reader.fillContent(PrintTail);
+		reader.fillContent(PrintStringTail);
 		if(ch == '=') {
 			state = State.PrintScript;
+			reader.fillContent(PrintExpressionHead);
 		} else {
 			state = State.InvokeScript;
 			reader.fillChar((char) ch);
@@ -115,7 +110,10 @@ class HtmlTemplateReader extends AllowFillReader {
 	private int handleCharWhenIsScript(int ch) throws IOException {
 		if(ch == '%' && (ch = reader.read()) >= 0) {
 			if(ch == '>') {
-				reader.fillContent(PrintHead);
+				if(state == State.PrintScript) {
+					reader.fillContent(PrintExpressionTail);
+				}
+				reader.fillContent(PrintStringHead);
 				reader.setEscapeFlag(true);
 				state = State.Content;
 				ch = reader.read();

@@ -71,6 +71,10 @@ class RequireListReader extends AllowFillReader {
 				if(ch == '~') {
 					nextReader = createNextListReader();
 					ch = tryReadFromNextReader();
+				} else {
+					fillChar('%');
+					fillChar((char) ch);
+					ch = '<';
 				}
 			} else {
 				fillChar((char) ch);

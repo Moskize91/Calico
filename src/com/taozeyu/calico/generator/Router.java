@@ -63,7 +63,7 @@ public class Router {
 	
 	private FileGenerator createFileGenerator(String absolutePath, String[] pathCells, String extensionName) {
 		
-		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells);
+		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
 		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
 		File templatePath = getTemplatePath(path, extensionName);
 		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
@@ -82,16 +82,16 @@ public class Router {
 		return path;
 	}
 
-	private int findEndOfExistDirIndex(String[] pathCells) {
+	private int findEndOfExistDirIndex(String[] pathCells, String extensionName) {
 		int endOfExistDirIndex = -1;
 		File path = new File("");
 		for(int i=0; i<pathCells.length; ++i) {
-			String pathCell = pathCells[i];
+			endOfExistDirIndex = i;
+			String pathCell = pathCells[i] + "." + extensionName;
 			path = new File(path, pathCell);
 			if(isFileExist(path)) {
 				break;
 			}
-			endOfExistDirIndex = i;
 		}
 		return endOfExistDirIndex;
 	}

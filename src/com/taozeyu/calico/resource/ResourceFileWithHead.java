@@ -18,7 +18,7 @@ import com.taozeyu.calico.GlobalConifg;
 
 public class ResourceFileWithHead {
 
-	private static final Pattern HeadLinePattern = Pattern.compile("^(\\w|\\-)+\\s*:\\w*(\\w|\\-)+$");
+	private static final Pattern HeadLinePattern = Pattern.compile("^(\\w|\\-)+\\s*:\\s*.+\\s*$");
 	private static final int ReadAttributeBufferedSize = 128;
 	
 	private final File resourceFile;
@@ -47,7 +47,7 @@ public class ResourceFileWithHead {
 		return getAttributeMapAndReadIfNotExist().containsKey(name);
 	}
 	
-	public String getAttribute(String name) throws IOException {
+	public String get(String name) throws IOException {
 		return getAttributeMapAndReadIfNotExist().get(name);
 	}
 	
@@ -70,6 +70,7 @@ public class ResourceFileWithHead {
 		ResourceHeadContentReader headReader = new ResourceHeadContentReader(createResourceFileReader(), resourceFile.getPath());
 		try {
 			Map<String, String> attributeMap = new HashMap<String, String>();
+			headReader.read();
 			if(headReader.hasAnyContent()) {
 				String content = headReader.getContent();
 				for(String line:spliteIntoLineAndClearEmptyLine(content)) {

@@ -71,6 +71,7 @@ public class FileGenerator {
 		Reader reader = getTemplateReader();
 		
 		try {
+			jse.put("R", resource);
 		    jse.getContext().setWriter(writer);
 		    jse.eval(getFileContentFromReader(reader));
 		    
@@ -124,7 +125,6 @@ public class FileGenerator {
 	private void loadScriptLiberary(ScriptEngine engine, File file) throws ScriptException, IOException {
 		Reader reader = getReaderFromFile(file, LiberaryCharset);
 		try {
-			engine.put("R", resource);
 			engine.getContext().setWriter(new OutputStreamWriter(System.out, LiberaryCharset));
 			engine.getContext().setErrorWriter(new OutputStreamWriter(System.err, LiberaryCharset));
 			engine.eval(reader);

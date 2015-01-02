@@ -12,9 +12,16 @@ class ResourceHeadContentReader {
 	private final StringBuilder contentBuilder;
 	
 	private String content = "";
+	private boolean finishReadMark;
 	
 	private int readContinuousBarSignCount = 0;
 	private boolean hasReadFirstContinuousTreeBarSign = false;
+	
+	private State state = State.Init;
+	
+	private static enum State {
+		Init, BarSign, HeadContent,
+	}
 	
 	ResourceHeadContentReader(Reader reader, String resourceName) {
 		this.reader = reader;
@@ -26,8 +33,8 @@ class ResourceHeadContentReader {
 		for(int ch = reader.read(); ch > 0; ch = reader.read()) {
 			boolean finish = readOneCharAndCheckIsFinish((char) ch);
 			if(finish) {
-				//contentBuilder 会缓存末尾额外的 '--'，因为在读到第3个'-'之前我不知道这个东西是个完整的'---'。
-				content = subStringLast2Char(contentBuilder.toString());
+				//contentBuilder 会缓存末尾额外的 '---'，这是多余的，因此必须删掉。
+				content = subStringLast3Char(contentBuilder.toString());
 				return;
 			}
 		}
@@ -39,8 +46,8 @@ class ResourceHeadContentReader {
 		}
 	}
 
-	private String subStringLast2Char(String str) {
-		return str.substring(0, str.length() - 2);
+	private String subStringLast3Char(String str) {
+		return str.replaceAll("(^\\-{3}|\\-{3}$)", "");
 	}
 	
 	void close() throws IOException {
@@ -56,37 +63,57 @@ class ResourceHeadContentReader {
 	}
 	
 	private boolean readOneCharAndCheckIsFinish(char ch) {
-		boolean finish = false;
-		
-		if(hasReadContinuousThreeBarSignChar(ch)) {
-			if(hasReadFirstContinuousTreeBarSign) {
-				finish = true;
-			} else {
-				hasReadFirstContinuousTreeBarSign = true;
-			}
-		} else {
-			if(hasReadFirstContinuousTreeBarSign) {
-				contentBuilder.append(ch);
-			} else {
-				finish = true;//文件起始不是 "---"，表明这个文件头部没有包含属性，因此没必要读，直接结束。
-			}
+		finishReadMark = false;
+		switch(state) {
+		case Init:
+			handleWhenInit(ch);
+			break;
+			
+		case BarSign:
+			handleWhenIsBarSign(ch);
+			break;
+			
+		case HeadContent:
+			handleWhenIsHeadContent(ch);
+			break;
 		}
-		return finish;
+		contentBuilder.append((char) ch);
+		
+		return finishReadMark;
 	}
 
-	private boolean hasReadContinuousThreeBarSignChar(char ch) {
+	private void handleWhenInit(char ch) {
+		if(ch == '-') {
+			readContinuousBarSignCount++;
+			state = State.BarSign;
+		} else {
+			finishReadMark = true;//文件起始不是 "---"，表明这个文件头部没有包含属性，因此没必要读，直接结束。
+		}
+	}
+
+	private void handleWhenIsBarSign(char ch) {
 		if(ch == '-') {
 			readContinuousBarSignCount++;
 			if(readContinuousBarSignCount >= ContinuousBarSignNum) {
-				readContinuousBarSignCount = 0;
-				return true;
+				if(hasReadFirstContinuousTreeBarSign) {
+					finishReadMark = true;
+				} else {
+					hasReadFirstContinuousTreeBarSign = true;
+				}
 			}
 		} else {
 			readContinuousBarSignCount = 0;
+			state = State.HeadContent;
 		}
-		return false;
 	}
-	
+
+	private void handleWhenIsHeadContent(char ch) {
+		if(ch == '-') {
+			readContinuousBarSignCount++;
+			state = State.BarSign;
+		}
+	}
+
 	private boolean isReadingContinuousBarSign() {
 		return readContinuousBarSignCount > 0;
 	}
