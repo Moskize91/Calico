@@ -9,6 +9,8 @@ Calico
 
 Calico 会假装自己是一个动态 Web 服务器，虽然它最终只能生成静态页面。如图所示，为 Calico 处理一个请求的流程。
 
+![Calico如何工作](https://cloud.githubusercontent.com/assets/6957148/5595888/e8f8ed3a-92b9-11e4-9963-a6bc39623f8a.jpg)
+
 1.	Routes 会将一个地址映射到一个 Template 文件上。例如，对于 /article/log/2015-01-02-hello-world.html ，如果存在存储路径为 /article/log.html 的 Temlate（模板）文件，则 Routes 会将 2015-01-02-hello-world 作为参数，并将这个请求交由 /article/log.html 处理。
 
 	Routes 规则仅仅由 Template 文件的命名和相对项目的路径来决定。
