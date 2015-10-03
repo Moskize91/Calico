@@ -40,14 +40,9 @@ public class ResourceManager {
 	private File getPageFile(String path) {
 		path = clearExtensionName(path);
 		File pageFile = null;
-		boolean hasFound = false;
 		for(String extensionName:ResourceTemplateExtensionNames) {
 			File file = new File(sourceDir.getPath(), path + "." + extensionName);
 			if(file.exists() && file.isFile()) {
-				if(hasFound) {
-					throw new ResourceException("there are 2 file named '" + path + "'.");
-				}
-				hasFound = true;
 				pageFile = file;
 			}
 		}
@@ -86,5 +81,29 @@ public class ResourceManager {
 			}
 		}
 		return (ResourceManager[]) dirsList.toArray(new ResourceManager[dirsList.size()]);
+	}
+
+	public AbstractPageResource[] pages() {
+		List<AbstractPageResource> pagesList = new LinkedList<AbstractPageResource>();
+		for(File file:sourceDir.listFiles()) {
+			if(!file.isDirectory()) {
+				AbstractPageResource page = page(file.getName());
+				// if page's extend name can't recognize, it should ignore.
+				if (page != null) {
+					pagesList.add(page);
+				}
+			}
+		}
+		return (AbstractPageResource[]) pagesList.toArray(new AbstractPageResource[pagesList.size()]);
+	}
+
+	public AbstractPageResource[] allPages() {
+		List<AbstractPageResource> pagesList = new LinkedList<AbstractPageResource>();
+		for (ResourceManager resourceManager : dirs()) {
+			for (AbstractPageResource page : resourceManager.pages()) {
+				pagesList.add(page);
+			}
+		}
+		return (AbstractPageResource[]) pagesList.toArray(new AbstractPageResource[pagesList.size()]);
 	}
 }
