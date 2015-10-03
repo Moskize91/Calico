@@ -5,7 +5,7 @@ import java.io.Reader;
 
 class HtmlTemplateReader extends AllowFillReader {
 
-	// Nashorn 似乎对于 JavaScript 代码每一行字符数有限制（超出后将忽视），因此必须将过长的 print 语句拆成多行。
+	// Nashorn would limit JavaScript code line.
 	private static final int PrintCharNumLimit = 500;
 	
 	private static final String PrintStringHead = "print('";

@@ -19,7 +19,7 @@ class ResourceHeadContentReader {
 	
 	private State state = State.Init;
 	
-	private static enum State {
+	private enum State {
 		Init, BarSign, HeadContent,
 	}
 	
@@ -33,15 +33,15 @@ class ResourceHeadContentReader {
 		for(int ch = reader.read(); ch > 0; ch = reader.read()) {
 			boolean finish = readOneCharAndCheckIsFinish((char) ch);
 			if(finish) {
-				//contentBuilder »á»º´æÄ©Î²¶îÍâµÄ '---'£¬ÕâÊÇ¶àÓàµÄ£¬Òò´Ë±ØĞëÉ¾µô¡£
+				//contentBuilder ä¼šç¼“å­˜æœ«å°¾é¢å¤–çš„ '---'ï¼Œè¿™æ˜¯å¤šä½™çš„ï¼Œå› æ­¤å¿…é¡»åˆ æ‰ã€‚
 				content = subStringLast3Char(contentBuilder.toString());
 				return;
 			}
 		}
 		if(!isReadingContinuousBarSign()) {
-			/* 1¡¢µ±Ç°Ã»ÓĞÔÚ¶Á '---' ËµÃ÷Õâ¸ö×ÊÔ´ÎÄ¼ş¿ÉÄÜÃ»ÓĞ Head£¬ÕâÖÖÇé¿ö²»Ó¦¸ÃÅ×³öÒì³££¬¶øÓ¦¸ÃÊÓÎª content Îª¿Õ²¢Õı³£·µ»Ø¡£
-			 * 2¡¢Ã»ÓĞÔÚ¶Á '---' Ê±×ßµ½ÕâÒ»²½ËµÃ÷ Head Ã»¶ÁÍêÎÄ¼ş¾Í½áÊøÁË£¬ËµÃ÷×ÊÔ´ÎÄ¼şÒÅÂ©ÁËÏÂÃæµÄ '---'£¬ÕâÊÇÒ»ÖÖ¸ñÊ½´íÎó¡£
-			 * 3¡¢Èç¹û¶Áµ½Á½¸ö '---'£¨ Head±»ÕâÁ½¸ö '---' °üº¬ÆğÀ´£©£¬ÔòÍ¨¹ı finish == true È»ºó return ÁË¡£´ËÊ±Á÷³Ì²»»á×ßµ½ÕâÒ»²½¡£ */
+			/* 1ã€å½“å‰æ²¡æœ‰åœ¨è¯» '---' è¯´æ˜è¿™ä¸ªèµ„æºæ–‡ä»¶å¯èƒ½æ²¡æœ‰ Headï¼Œè¿™ç§æƒ…å†µä¸åº”è¯¥æŠ›å‡ºå¼‚å¸¸ï¼Œè€Œåº”è¯¥è§†ä¸º content ä¸ºç©ºå¹¶æ­£å¸¸è¿”å›ã€‚
+			 * 2ã€æ²¡æœ‰åœ¨è¯» '---' æ—¶èµ°åˆ°è¿™ä¸€æ­¥è¯´æ˜ Head æ²¡è¯»å®Œæ–‡ä»¶å°±ç»“æŸäº†ï¼Œè¯´æ˜èµ„æºæ–‡ä»¶é—æ¼äº†ä¸‹é¢çš„ '---'ï¼Œè¿™æ˜¯ä¸€ç§æ ¼å¼é”™è¯¯ã€‚
+			 * 3ã€å¦‚æœè¯»åˆ°ä¸¤ä¸ª '---'ï¼ˆ Headè¢«è¿™ä¸¤ä¸ª '---' åŒ…å«èµ·æ¥ï¼‰ï¼Œåˆ™é€šè¿‡ finish == true ç„¶å return äº†ã€‚æ­¤æ—¶æµç¨‹ä¸ä¼šèµ°åˆ°è¿™ä¸€æ­¥ã€‚ */
 			throw new ResourceException("resource file missing '---' at the end. "+ resourceName);
 		}
 	}
@@ -87,7 +87,7 @@ class ResourceHeadContentReader {
 			readContinuousBarSignCount++;
 			state = State.BarSign;
 		} else {
-			finishReadMark = true;//ÎÄ¼şÆğÊ¼²»ÊÇ "---"£¬±íÃ÷Õâ¸öÎÄ¼şÍ·²¿Ã»ÓĞ°üº¬ÊôĞÔ£¬Òò´ËÃ»±ØÒª¶Á£¬Ö±½Ó½áÊø¡£
+			finishReadMark = true;//æ–‡ä»¶èµ·å§‹ä¸æ˜¯ "---"ï¼Œè¡¨æ˜è¿™ä¸ªæ–‡ä»¶å¤´éƒ¨æ²¡æœ‰åŒ…å«å±æ€§ï¼Œå› æ­¤æ²¡å¿…è¦è¯»ï¼Œç›´æ¥ç»“æŸã€‚
 		}
 	}
 

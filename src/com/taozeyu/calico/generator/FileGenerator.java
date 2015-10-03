@@ -61,7 +61,7 @@ public class FileGenerator {
 			loadEveryScriptLiberary(engine);
 	    } catch (ScriptException e) {
 	    	e.printStackTrace();
-	    	System.exit(1); //标准库出问题，只能退出。
+	    	System.exit(1); //can only exit when JS lib throws error.
 	    }
 		return engine;
 	}
@@ -81,9 +81,10 @@ public class FileGenerator {
 			reader.close();
 		}
 	}
-	
-	//很遗憾，Nashorn 从很长的流中读取代码会遗漏一部分，但是将其缓存成 String 传入再读却完全没有问题。 
-	//目前不知道为什么。
+
+	// Nashorn engine would omit some content if read from a long stream.
+	// But all will be fine if buffered them before reading.
+	// I don't know why.
 	private String getFileContentFromReader(Reader reader) throws IOException {
 	    StringBuilder sb = new StringBuilder();
 	    for(int ch = reader.read(); ch >= 0; ch = reader.read()) {
