@@ -21,7 +21,7 @@ public class ResourceFileWithHead {
 	private static final Pattern HeadLinePattern = Pattern.compile("^(\\w|\\-)+\\s*:\\s*.+\\s*$");
 	private static final int ReadAttributeBufferedSize = 128;
 	
-	private final File resourceFile;
+	protected final File resourceFile;
 	
 	private Map<String, String> attributeMap = null;
 	
@@ -29,7 +29,7 @@ public class ResourceFileWithHead {
 		this.resourceFile = resourceFile;
 	}
 
-	public Reader createResourceFileReaderBuyJumpOverHead() throws IOException {
+	public Reader createResourceFileReaderByJumpOverHead() throws IOException {
 		Reader reader = createResourceFileReader();
 		jumpOverHead(reader);
 		return reader;

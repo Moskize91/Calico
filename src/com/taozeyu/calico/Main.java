@@ -46,6 +46,6 @@ public class Main {
 	}
 
 	private static boolean isAbsolutePath(String path) {
-		return path.matches("([a-zA-Z]+:)?(\\|/)");
+		return path.matches("([a-zA-Z]+:)?(\\\\|/).*");
 	}
 }
