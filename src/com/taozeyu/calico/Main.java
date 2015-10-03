@@ -8,15 +8,12 @@ import com.taozeyu.calico.resource.ResourceManager;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+
+		File projectPath = getDirFromPath(getElementFromArgs(args, 0, "./"));
+		File targetPath = getDirFromPath(getElementFromArgs(args, 1, "./"));
+		String rootMapToPath = getElementFromArgs(args, 2, "/index.html");
 		
-		if(args.length != 3) {
-			throw new RuntimeException("need 3 arguments, not " + args.length + ".");
-		}
-		File projectPath = getDirFromPath(args[0]);
-		File targetPath = getDirFromPath(args[1]);
-		String rootMapToPath = args[2];
-		
-		File rootPath = new File(projectPath.getPath(), "tempate");
+		File rootPath = new File(projectPath.getPath(), "template");
 		File resourcePath = new File(projectPath.getPath(), "resource");
 		
 		ResourceManager resource = new ResourceManager(resourcePath);
@@ -24,12 +21,22 @@ public class Main {
 		
 		new ContentBuilder(router, targetPath).buildFromRootFile();
 	}
-	
+
+	private static String getElementFromArgs(String[] args, int index, String defaultValue) {
+		if (index >= args.length) {
+			return defaultValue;
+		} else {
+			return args[index];
+		}
+	}
+
+
 	private static File getDirFromPath(String path) {
 		File file;
 		if(isAbsolutePath(path)) {
 			file = new File(path);
 		} else {
+			path = path.replaceAll("^\\./", "");
 			file = new File(System.getProperty("user.dir"), path);
 		}
 		if(!file.exists() || !file.isDirectory()) {
