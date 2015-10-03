@@ -1,2 +1,1 @@
-ant build
-ant clean
+ant build clean
