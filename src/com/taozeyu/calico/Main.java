@@ -11,7 +11,7 @@ public class Main {
 
 		File projectPath = getDirFromPath(getElementFromArgs(args, 0, "./"));
 		File targetPath = getDirFromPath(getElementFromArgs(args, 1, "./"));
-		String rootMapToPath = getElementFromArgs(args, 2, "/index.html");
+		String rootMapToPath = normalizePath(getElementFromArgs(args, 2, "/index.html"));
 		
 		File rootPath = new File(projectPath.getPath(), "template");
 		File resourcePath = new File(projectPath.getPath(), "resource");
@@ -30,7 +30,6 @@ public class Main {
 		}
 	}
 
-
 	private static File getDirFromPath(String path) {
 		File file;
 		if(isAbsolutePath(path)) {
@@ -47,5 +46,9 @@ public class Main {
 
 	private static boolean isAbsolutePath(String path) {
 		return path.matches("([a-zA-Z]+:)?(\\\\|/).*");
+	}
+
+	private static String normalizePath(String path) {
+		return path.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+/?)?$", "");
 	}
 }

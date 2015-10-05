@@ -24,11 +24,27 @@ class RequireListReader extends AllowFillReader {
 	private final File routeDir;
 	
 	private RequireListReader nextReader = null;
+	private RequireListReader yieldReader = null;
 	
 	RequireListReader(File readFile, File routeDir) throws IOException {
 		this(null, readFile, routeDir);
 	}
-	
+
+	void setYieldReader(RequireListReader reader) {
+		yieldReader = reader;
+	}
+
+    RequireListReader getLayoutRequireListReader() throws IOException {
+        File layoutFile = getFileByRequireInfo("layout.html");
+        if (!requireInfoHasNoError(layoutFile)) {
+            layoutFile = getFileByRequireInfo("/layout.html");
+        }
+        if (requireInfoHasNoError(layoutFile)) {
+            return new RequireListReader(null, layoutFile, routeDir);
+        }
+        return null;
+    }
+
 	private RequireListReader(RequireListReader parent, File readFile,  File routeDir) throws IOException {
 		this.reader =  createReader(readFile);
 		this.parent = parent;
@@ -114,12 +130,19 @@ class RequireListReader extends AllowFillReader {
 	}
 
 	private RequireListReader createNextListReader() throws IOException {
+		RequireListReader nextListReader;
 		String requireInfo = readRequireInfoFromReader();
 		requireInfo = requireInfo.trim();
-		checkRequireInfoFormatError(requireInfo);
-		File requireTemplateFile = getTemplateFile(requireInfo);
-		checkRequireFileError(requireTemplateFile);
-		return new RequireListReader(this, requireTemplateFile, routeDir);
+		if (requireInfo.equals("yield") && yieldReader != null) {
+			nextListReader = yieldReader;
+			yieldReader = null;
+		} else {
+			checkRequireInfoFormatError(requireInfo);
+			File requireTemplateFile = getFileByRequireInfo(requireInfo);
+			checkRequireFileError(requireTemplateFile);
+			nextListReader = new RequireListReader(this, requireTemplateFile, routeDir);
+		}
+		return nextListReader;
 	}
 
 	private void checkRequireInfoFormatError(String requireInfo) {
@@ -128,21 +151,30 @@ class RequireListReader extends AllowFillReader {
 		}
 	}
 
-	private File getTemplateFile(String requireInfo) {
-		File requireTemplateFile;
-		if(isAbosultePath(requireInfo)) {
-			requireTemplateFile = new File(routeDir, requireInfo);
-		} else {
-			requireTemplateFile = new File(readFile.getParent(), requireInfo);
-		}
-		return requireTemplateFile;
-	}
+    private File getFileByRequireInfo(String requireInfo) {
+        File requireTemplateFile;
+        if(isAbosultePath(requireInfo)) {
+            requireTemplateFile = new File(routeDir, requireInfo);
+        } else {
+            requireTemplateFile = new File(readFile.getParent(), requireInfo);
+        }
+        return requireTemplateFile;
+    }
 
-	private boolean isAbosultePath(String requireInfo) {
+    private boolean isAbosultePath(String requireInfo) {
 		return requireInfo.startsWith("/");
 	}
 
-	private void checkRequireFileError(File requireTemplateFile) {
+    private boolean requireInfoHasNoError(File requireTemplateFile) {
+        try {
+            checkRequireFileError(requireTemplateFile);
+            return true;
+        } catch (TemplateException e) {
+            return false;
+        }
+    }
+
+    private void checkRequireFileError(File requireTemplateFile) {
 		if(!requireTemplateFile.exists() || !requireTemplateFile.isFile()) {
 			throw new TemplateException("not found template file '"+ requireTemplateFile.getPath() + "'.");
 		}
@@ -164,6 +196,9 @@ class RequireListReader extends AllowFillReader {
 	@Override
 	public void close() throws IOException {
 		reader.close();
+		if (yieldReader != null) {
+			yieldReader.close();
+		}
 		if(nextReader != null) {
 			clearNextReader();
 		}
