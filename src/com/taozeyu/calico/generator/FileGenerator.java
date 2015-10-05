@@ -30,8 +30,8 @@ public class FileGenerator {
 
 	private static final int BufferedSize = 1024;
 	
-	private static final String LiberaryPath = "javascript";
-	private static final Charset LiberaryCharset = Charset.forName("UTF-8");
+	private static final String LibraryPath = "javascript";
+	private static final Charset LibraryCharset = Charset.forName("UTF-8");
 	
 	private final ResourceManager resource;
 	
@@ -130,10 +130,10 @@ public class FileGenerator {
 	}
 
 	private void loadScriptLiberary(ScriptEngine engine) throws ScriptException, IOException {
-		Reader reader = getReaderFromFile(LiberaryCharset);
+		Reader reader = getReaderFromFile(LibraryCharset);
 		try {
-			engine.getContext().setWriter(new OutputStreamWriter(System.out, LiberaryCharset));
-			engine.getContext().setErrorWriter(new OutputStreamWriter(System.err, LiberaryCharset));
+			engine.getContext().setWriter(new OutputStreamWriter(System.out, LibraryCharset));
+			engine.getContext().setErrorWriter(new OutputStreamWriter(System.err, LibraryCharset));
 			engine.eval(reader);
 		} finally {
 			reader.close();
@@ -141,7 +141,7 @@ public class FileGenerator {
 	}
 
 	private File getLiberaryDirPath() {
-		File liberaryPath = new File(System.getProperty("user.dir"), LiberaryPath);
+		File liberaryPath = new File(System.getProperty("user.dir"), LibraryPath);
 		
 		if(!liberaryPath.exists() || !liberaryPath.isDirectory()) {
 			throw new TemplateException("can't find javascript library '"+ liberaryPath.getPath() +"'.");
