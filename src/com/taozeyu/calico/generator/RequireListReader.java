@@ -36,7 +36,7 @@ class RequireListReader extends AllowFillReader {
 
     RequireListReader getLayoutRequireListReader() throws IOException {
         File layoutFile = getFileByRequireInfo("layout.html");
-        if (requireInfoHasNoError(layoutFile)) {
+        if (!requireInfoHasNoError(layoutFile)) {
             layoutFile = getFileByRequireInfo("/layout.html");
         }
         if (requireInfoHasNoError(layoutFile)) {

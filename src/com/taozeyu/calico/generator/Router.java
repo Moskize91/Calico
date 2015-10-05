@@ -11,12 +11,12 @@ public class Router {
 	public static final String RootPath = "/";
 
 	private final ResourceManager resource;
-	private final File templatePath;
+	private final File routeDir;
 	private final String rootMapToPath;
 	
-	public Router(ResourceManager resource, File templatePath, String rootMapToPath) {
+	public Router(ResourceManager resource, File routeDir, String rootMapToPath) {
 		this.resource = resource;
-		this.templatePath = templatePath;
+		this.routeDir = routeDir;
 		this.rootMapToPath = rootMapToPath;
 	}
 	
@@ -31,10 +31,10 @@ public class Router {
 	}
 
 	private FileGenerator useAbsoluteTemplateOrUseParams(String targetPath) {
-		File targetPathTemplateFile = new File(templatePath, targetPath);
+		File targetPathTemplateFile = new File(routeDir, targetPath);
 		if(targetPathTemplateFile.exists()) {
 			String params = "";
-			return new FileGenerator(resource, new File(targetPath), targetPathTemplateFile, templatePath, params);
+			return new FileGenerator(resource, new File(targetPath), targetPathTemplateFile, routeDir, params);
 			
 		} else {
 			String extensionName = getExtensionName(targetPath);
@@ -69,7 +69,7 @@ public class Router {
 		File templatePath = getTemplatePath(path, extensionName);
 		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
 		checkTemplatePath(templatePath); 
-		return new FileGenerator(resource, new File(absolutePath), templatePath, templatePath, params);
+		return new FileGenerator(resource, new File(absolutePath), templatePath, routeDir, params);
 	}
 
 	private String getTemplateDirPath(String[] pathCells, int endOfExistDirIndex) {
@@ -98,7 +98,7 @@ public class Router {
 	}
 
 	private boolean isFileExist(File path) {
-		return new File(templatePath.getPath(), path.getPath()).exists();
+		return new File(routeDir.getPath(), path.getPath()).exists();
 	}
 
 	private String selectParamsFromPath(String pathCells[], int startIndex) {
@@ -119,6 +119,6 @@ public class Router {
 	}
 
 	private File getTemplatePath(String dirPath, String extensionName) {
-		return new File(templatePath.getPath(), dirPath + "." + extensionName);
+		return new File(routeDir.getPath(), dirPath + "." + extensionName);
 	}
 }
