@@ -58,7 +58,7 @@ public class FileGenerator {
 	    ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 	    engine.put("params", params);
 	    try {
-			loadEveryScriptLiberary(engine);
+			loadEveryScriptLibrary(engine);
 	    } catch (ScriptException e) {
 	    	e.printStackTrace();
 	    	System.exit(1); //can only exit when JS lib throws error.
@@ -105,26 +105,32 @@ public class FileGenerator {
 	}
 
 	private File getTargetFile(File targetDir) {
-		return new File(targetDir, absolutePath.getPath());
+		return new File(targetDir, absolutePath.getPath() + ".html");
 	}
 
 	private Reader getTemplateReader() throws IOException {
-		Reader reader = new RequireListReader(templatePath, routeDir);
-		return new HtmlTemplateReader(reader);
+		RequireListReader templateReader = new RequireListReader(templatePath, routeDir);
+		RequireListReader layoutReader = templateReader.getLayoutRequireListReader();
+		if (layoutReader != null) {
+			layoutReader.setYieldReader(templateReader);
+			return new HtmlTemplateReader(layoutReader);
+		} else {
+			return new HtmlTemplateReader(templateReader);
+		}
 	}
 
-	private void loadEveryScriptLiberary(ScriptEngine engine) throws ScriptException, IOException {
-		File liberaryPath = getLiberaryDirPath();
-		File[] files = liberaryPath.listFiles();
+	private void loadEveryScriptLibrary(ScriptEngine engine) throws ScriptException, IOException {
+		File libraryPath = getLiberaryDirPath();
+		File[] files = libraryPath.listFiles();
 		for(File file:files) {
 			if(isExtensionNameJs(file)) {
-				loadScriptLiberary(engine, file);
+				loadScriptLiberary(engine);
 			}
 		}
 	}
 
-	private void loadScriptLiberary(ScriptEngine engine, File file) throws ScriptException, IOException {
-		Reader reader = getReaderFromFile(file, LiberaryCharset);
+	private void loadScriptLiberary(ScriptEngine engine) throws ScriptException, IOException {
+		Reader reader = getReaderFromFile(LiberaryCharset);
 		try {
 			engine.getContext().setWriter(new OutputStreamWriter(System.out, LiberaryCharset));
 			engine.getContext().setErrorWriter(new OutputStreamWriter(System.err, LiberaryCharset));
@@ -138,7 +144,7 @@ public class FileGenerator {
 		File liberaryPath = new File(System.getProperty("user.dir"), LiberaryPath);
 		
 		if(!liberaryPath.exists() || !liberaryPath.isDirectory()) {
-			throw new TemplateException("can't find javascript liberary '"+ liberaryPath.getPath() +"'.");
+			throw new TemplateException("can't find javascript library '"+ liberaryPath.getPath() +"'.");
 		}
 		return liberaryPath;
 	}
@@ -147,14 +153,14 @@ public class FileGenerator {
 		return file.getName().matches(".+\\.(?i)js$");
 	}
 	
-	private Reader getReaderFromFile(File file, Charset charset) throws FileNotFoundException {
+	private Reader getReaderFromFile(Charset charset) throws FileNotFoundException {
 		InputStream inputStream = new FileInputStream(templatePath);
 		inputStream = new BufferedInputStream(inputStream, BufferedSize);
 		return  new InputStreamReader(inputStream, charset);
 	}
 
 	private List<String> createPageLinkList(File targetDir) throws IOException {
-		Document doc = getDocumentFromTargetFIle(targetDir);
+		Document doc = getDocumentFromTargetFile(targetDir);
 		List<String> pageLinkList = new LinkedList<String>();
 		
 		for(Element link:doc.select("a[href~=^.+\\.html?$]")) {
@@ -163,7 +169,7 @@ public class FileGenerator {
 		return pageLinkList;
 	}
 
-	private Document getDocumentFromTargetFIle(File targetDir) throws IOException {
+	private Document getDocumentFromTargetFile(File targetDir) throws IOException {
 		File targetFile = getTargetFile(targetDir);
 		String charsetName = GlobalConifg.instance.getCharset().name();
 		Document doc = Jsoup.parse(targetFile, charsetName);

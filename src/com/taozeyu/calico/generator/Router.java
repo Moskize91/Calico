@@ -21,11 +21,12 @@ public class Router {
 	}
 	
 	public FileGenerator getFileGenerator(String absolutePath) {
-		
-		if(absolutePath.equals(RootPath)) {
-			absolutePath = rootMapToPath;
-		}
+
 		String targetPath = normalizePath(absolutePath);
+
+		if(targetPath.equals(RootPath)) {
+			targetPath = rootMapToPath;
+		}
 		return useAbsoluteTemplateOrUseParams(targetPath);
 	}
 
@@ -58,7 +59,7 @@ public class Router {
 	}
 
 	private String normalizePath(String absolutePath) {
-		return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+)?/$", "");
+		return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+/?)?$", "");
 	}
 	
 	private FileGenerator createFileGenerator(String absolutePath, String[] pathCells, String extensionName) {
