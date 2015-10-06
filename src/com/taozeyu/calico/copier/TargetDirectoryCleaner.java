@@ -1,4 +1,4 @@
-package com.taozeyu.calico.cleaner;
+package com.taozeyu.calico.copier;
 
 import java.io.File;
 
@@ -18,7 +18,7 @@ public class TargetDirectoryCleaner {
 
     public void clean() {
         System.out.println("");
-        System.out.println("Clean target directory: "+ targetPath);
+        System.out.println("Clean target directory: " + targetPath);
         cleanDirectory(targetPath);
     }
 
