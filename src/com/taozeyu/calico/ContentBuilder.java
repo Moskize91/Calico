@@ -30,9 +30,12 @@ class ContentBuilder {
 	}
 	
 	void buildFromRootFile() throws IOException, ScriptException {
+		System.out.println("");
+		System.out.println("Generate html pages.");
 		findPathAndTryAddToQueue(Router.RootPath);
 		while(!isQueueEmpty()) {
 			String path = getPathFromQueue();
+			System.out.println("\tgenerate path "+ path);
 			FileGenerator generator = router.getFileGenerator(path);
 			List<String> linkList = generator.generateAndGetPageLinkList(targetDir);
 			for(String linkPath: linkList) {

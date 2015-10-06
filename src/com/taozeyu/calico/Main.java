@@ -2,6 +2,7 @@ package com.taozeyu.calico;
 
 import java.io.File;
 
+import com.taozeyu.calico.cleaner.TargetDirectoryCleaner;
 import com.taozeyu.calico.generator.Router;
 import com.taozeyu.calico.resource.ResourceManager;
 
@@ -18,7 +19,8 @@ public class Main {
 		
 		ResourceManager resource = new ResourceManager(resourcePath);
 		Router router = new Router(resource, rootPath, rootMapToPath);
-		
+
+		new TargetDirectoryCleaner(targetPath).clean();
 		new ContentBuilder(router, targetPath).buildFromRootFile();
 	}
 
