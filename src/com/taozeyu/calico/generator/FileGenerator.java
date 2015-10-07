@@ -19,7 +19,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import com.taozeyu.calico.resource.JavaScriptResource;
+import com.taozeyu.calico.javascript_helper.JavaScriptLoader;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -57,7 +57,7 @@ public class FileGenerator {
 	    ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 	    engine.put("params", params);
 	    try {
-			new JavaScriptResource().loadSystemJavaScriptLib(engine);
+			new JavaScriptLoader().loadSystemJavaScriptLib(engine);
 	    } catch (ScriptException e) {
 	    	e.printStackTrace();
 	    	System.exit(1); //can only exit when JS lib throws error.

@@ -1,4 +1,4 @@
-package com.taozeyu.calico.resource;
+package com.taozeyu.calico.javascript_helper;
 
 import com.taozeyu.calico.SystemJavaScriptLog;
 
@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 /**
  * Created by taozeyu on 15/10/7.
  */
-public class JavaScriptResource {
+public class JavaScriptLoader {
 
     private static String[] SystemLibNames = new String[] {
         "test"
