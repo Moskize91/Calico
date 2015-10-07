@@ -74,13 +74,14 @@ public class ResourceManager {
 	}
 
 	private ResourceManager[] listAllDirsAndCreateResourceArray() {
+
 		List<ResourceManager> dirsList = new LinkedList<ResourceManager>();
 		for(File file:sourceDir.listFiles()) {
 			if(file.isDirectory()) {
 				dirsList.add(new ResourceManager(file));
 			}
 		}
-		return (ResourceManager[]) dirsList.toArray(new ResourceManager[dirsList.size()]);
+		return dirsList.toArray(new ResourceManager[dirsList.size()]);
 	}
 
 	public AbstractPageResource[] pages() {
@@ -94,7 +95,7 @@ public class ResourceManager {
 				}
 			}
 		}
-		return (AbstractPageResource[]) pagesList.toArray(new AbstractPageResource[pagesList.size()]);
+		return pagesList.toArray(new AbstractPageResource[pagesList.size()]);
 	}
 
 	public AbstractPageResource[] allPages() {
@@ -104,6 +105,6 @@ public class ResourceManager {
 				pagesList.add(page);
 			}
 		}
-		return (AbstractPageResource[]) pagesList.toArray(new AbstractPageResource[pagesList.size()]);
+		return pagesList.toArray(new AbstractPageResource[pagesList.size()]);
 	}
 }

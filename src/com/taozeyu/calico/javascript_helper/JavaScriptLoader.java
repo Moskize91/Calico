@@ -13,7 +13,8 @@ import java.nio.charset.Charset;
 public class JavaScriptLoader {
 
     private static String[] SystemLibNames = new String[] {
-        "test"
+            "resource_manager",
+            "pages_constructor",
     };
 
     private static final int BufferedSize = 1024;

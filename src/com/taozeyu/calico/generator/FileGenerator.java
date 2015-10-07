@@ -55,6 +55,7 @@ public class FileGenerator {
 
 	private ScriptEngine createScriptEngine() throws IOException {
 	    ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+		engine.put("__resource", resource);
 	    engine.put("params", params);
 	    try {
 			new JavaScriptLoader().loadSystemJavaScriptLib(engine);
@@ -70,7 +71,6 @@ public class FileGenerator {
 		Reader reader = getTemplateReader();
 		
 		try {
-			jse.put("R", resource);
 		    jse.getContext().setWriter(writer);
 		    jse.eval(getFileContentFromReader(reader));
 		    
