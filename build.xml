@@ -3,6 +3,7 @@
     <property name="lib.dir" value="lib"/>
     <property name="src.dir" value="src"/>
     <property name="classes.dir" value="bin"/>
+    <property name="javaScript.dir" value="javascript"/>
 
     <property name="output.dir" value="release"/>
     <property name="jarname" value="Calico-debug.jar"/>
@@ -54,6 +55,7 @@
                 <attribute name="Main-class" value="${mainclass}"/>
                 <attribute name="Class-Path" value="${mf.classpath}"/>
             </manifest>
+            <fileset dir="." includes="${javaScript.dir}/**"/>
         </jar>
     </target>
     
