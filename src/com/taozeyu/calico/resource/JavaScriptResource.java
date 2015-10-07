@@ -25,9 +25,10 @@ public class JavaScriptResource {
 
         loadLogObject(engine);
         ClassLoader loader = getClass().getClassLoader();
+
         for (String libName : SystemLibNames) {
             String path = LibraryPath +"/"+ libName +".js";
-            InputStream is = loader.getResourceAsStream("/"+path);
+            InputStream is = loader.getResourceAsStream(path);
             if (is == null) {
                 File file = new File(System.getProperty("user.dir"), path);
                 is = new FileInputStream(file);
