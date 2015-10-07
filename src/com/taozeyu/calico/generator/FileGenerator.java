@@ -66,7 +66,7 @@ public class FileGenerator {
 		return engine;
 	}
 
-	private void generateTargetFile(File targetDir, ScriptEngine jse) throws FileNotFoundException, ScriptException, IOException {
+	private void generateTargetFile(File targetDir, ScriptEngine jse) throws ScriptException, IOException {
 		Writer writer = getTargetFileWriter(targetDir);
 		Reader reader = getTemplateReader();
 		
@@ -120,16 +120,16 @@ public class FileGenerator {
 	}
 
 	private void loadEveryScriptLibrary(ScriptEngine engine) throws ScriptException, IOException {
-		File libraryPath = getLiberaryDirPath();
+		File libraryPath = getLibraryDirPath();
 		File[] files = libraryPath.listFiles();
 		for(File file:files) {
 			if(isExtensionNameJs(file)) {
-				loadScriptLiberary(engine);
+				loadScriptLibrary(engine);
 			}
 		}
 	}
 
-	private void loadScriptLiberary(ScriptEngine engine) throws ScriptException, IOException {
+	private void loadScriptLibrary(ScriptEngine engine) throws ScriptException, IOException {
 		Reader reader = getReaderFromFile(LibraryCharset);
 		try {
 			engine.getContext().setWriter(new OutputStreamWriter(System.out, LibraryCharset));
@@ -140,13 +140,13 @@ public class FileGenerator {
 		}
 	}
 
-	private File getLiberaryDirPath() {
-		File liberaryPath = new File(System.getProperty("user.dir"), LibraryPath);
-		
-		if(!liberaryPath.exists() || !liberaryPath.isDirectory()) {
-			throw new TemplateException("can't find javascript library '"+ liberaryPath.getPath() +"'.");
+	private File getLibraryDirPath() {
+		File libraryPath = new File(System.getProperty("user.dir"), LibraryPath);
+
+		if(!libraryPath.exists() || !libraryPath.isDirectory()) {
+			throw new TemplateException("can't find javascript library '"+ libraryPath.getPath() +"'.");
 		}
-		return liberaryPath;
+		return libraryPath;
 	}
 
 	private boolean isExtensionNameJs(File file) {
