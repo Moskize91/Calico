@@ -45,6 +45,9 @@ public class ResourceFileCopier {
     }
 
     private void copyFile(File sourceFile, File targetFile) throws IOException {
+
+        targetFile.getParentFile().mkdirs();
+
         int bufferLength = 1024;
         InputStream is = new BufferedInputStream(new FileInputStream(sourceFile), bufferLength);
         OutputStream os = new BufferedOutputStream(new FileOutputStream(targetFile), bufferLength);
