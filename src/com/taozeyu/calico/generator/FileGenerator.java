@@ -19,6 +19,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.taozeyu.calico.resource.JavaScriptResource;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,8 +30,6 @@ import com.taozeyu.calico.resource.ResourceManager;
 public class FileGenerator {
 
 	private static final int BufferedSize = 1024;
-	
-	private static final String LibraryPath = "javascript";
 	private static final Charset LibraryCharset = Charset.forName("UTF-8");
 	
 	private final ResourceManager resource;
@@ -58,7 +57,7 @@ public class FileGenerator {
 	    ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 	    engine.put("params", params);
 	    try {
-			loadEveryScriptLibrary(engine);
+			new JavaScriptResource().loadSystemJavaScriptLib(engine);
 	    } catch (ScriptException e) {
 	    	e.printStackTrace();
 	    	System.exit(1); //can only exit when JS lib throws error.
@@ -119,16 +118,6 @@ public class FileGenerator {
 		}
 	}
 
-	private void loadEveryScriptLibrary(ScriptEngine engine) throws ScriptException, IOException {
-		File libraryPath = getLibraryDirPath();
-		File[] files = libraryPath.listFiles();
-		for(File file:files) {
-			if(isExtensionNameJs(file)) {
-				loadScriptLibrary(engine);
-			}
-		}
-	}
-
 	private void loadScriptLibrary(ScriptEngine engine) throws ScriptException, IOException {
 		Reader reader = getReaderFromFile(LibraryCharset);
 		try {
@@ -140,19 +129,6 @@ public class FileGenerator {
 		}
 	}
 
-	private File getLibraryDirPath() {
-		File libraryPath = new File(System.getProperty("user.dir"), LibraryPath);
-
-		if(!libraryPath.exists() || !libraryPath.isDirectory()) {
-			throw new TemplateException("can't find javascript library '"+ libraryPath.getPath() +"'.");
-		}
-		return libraryPath;
-	}
-
-	private boolean isExtensionNameJs(File file) {
-		return file.getName().matches(".+\\.(?i)js$");
-	}
-	
 	private Reader getReaderFromFile(Charset charset) throws FileNotFoundException {
 		InputStream inputStream = new FileInputStream(templatePath);
 		inputStream = new BufferedInputStream(inputStream, BufferedSize);
@@ -162,7 +138,7 @@ public class FileGenerator {
 	private List<String> createPageLinkList(File targetDir) throws IOException {
 		Document doc = getDocumentFromTargetFile(targetDir);
 		List<String> pageLinkList = new LinkedList<String>();
-		
+
 		for(Element link:doc.select("a[href~=^.+\\.html?$]")) {
 			pageLinkList.add(link.attr("href"));
 		}
