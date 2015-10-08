@@ -6,8 +6,8 @@ import java.io.Reader;
 
 class HtmlPageResource extends AbstractPageResource {
 
-	HtmlPageResource(File resourceFile) {
-		super(resourceFile);
+	HtmlPageResource(File resourceFile, String resourcePath) {
+		super(resourceFile, resourcePath);
 	}
 
 	@Override

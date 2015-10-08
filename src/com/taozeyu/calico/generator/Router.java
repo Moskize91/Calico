@@ -67,14 +67,16 @@ public class Router {
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
 		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
 		File templatePath = getTemplatePath(path, extensionName);
+		if (templatePath == null) {
+			throw new RouteException("No template file map to '"+ absolutePath +"'.");
+		}
 		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
-		checkTemplatePath(templatePath); 
 		return new FileGenerator(resource, new File(absolutePath), templatePath, routeDir, params);
 	}
 
 	private String getTemplateDirPath(String[] pathCells, int endOfExistDirIndex) {
 		String path = "";
-		for(int i=0; i<endOfExistDirIndex + 1; ++i) {
+		for(int i=0; i < endOfExistDirIndex + 1; ++i) {
 			path += pathCells[i];
 			if(i < endOfExistDirIndex) {
 				path += "/";
@@ -87,12 +89,12 @@ public class Router {
 		int endOfExistDirIndex = -1;
 		File path = new File("");
 		for(int i=0; i<pathCells.length; ++i) {
-			endOfExistDirIndex = i;
 			String pathCell = pathCells[i] + "." + extensionName;
 			path = new File(path, pathCell);
-			if(isFileExist(path)) {
+			if(!isFileExist(path)) {
 				break;
 			}
+			endOfExistDirIndex = i;
 		}
 		return endOfExistDirIndex;
 	}
@@ -112,13 +114,19 @@ public class Router {
 		return params;
 	}
 
-	private void checkTemplatePath(File templatePath) {
-		if(!templatePath.exists() || !templatePath.isFile()) {
-			throw new RouteException("can't find template '"+ templatePath.getPath() +"'.");
-		}
+	private boolean isTemplateFile(File file) {
+		return file.exists() || file.isFile();
 	}
 
 	private File getTemplatePath(String dirPath, String extensionName) {
-		return new File(routeDir.getPath(), dirPath + "." + extensionName);
+		File file = new File(routeDir.getPath(), dirPath + "." + extensionName);
+		if (isTemplateFile(file)) {
+			return file;
+		}
+		file = new File(routeDir.getPath(), dirPath + "/index." + extensionName);
+		if (isTemplateFile(file)) {
+			return file;
+		}
+		return null;
 	}
 }

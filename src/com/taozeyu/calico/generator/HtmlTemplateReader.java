@@ -112,6 +112,8 @@ class HtmlTemplateReader extends AllowFillReader {
 			if(ch == '>') {
 				if(state == State.PrintScript) {
 					reader.fillContent(PrintExpressionTail);
+				} else if (state == State.InvokeScript) {
+					reader.fillContent("\n");
 				}
 				reader.fillContent(PrintStringHead);
 				reader.setEscapeFlag(true);

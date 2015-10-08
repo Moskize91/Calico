@@ -7,6 +7,8 @@ import java.util.List;
 public class ResourceManager {
 
 	private final File sourceDir;
+	private final ResourceManager rootResourceManager;
+
 	private ResourceManager[] dirs = null;
 	
 	private static final String ResourceTemplateExtensionNames[] = new String[] {
@@ -15,6 +17,12 @@ public class ResourceManager {
 	
 	public ResourceManager(File sourceDir) {
 		this.sourceDir = sourceDir;
+		this.rootResourceManager = this;
+	}
+
+	private ResourceManager(File sourceDir, ResourceManager rootResourceManager) {
+		this.sourceDir = sourceDir;
+		this.rootResourceManager = rootResourceManager;
 	}
 
 	public AbstractPageResource page(String path) {
@@ -22,31 +30,53 @@ public class ResourceManager {
 		if(pageFile == null) {
 			return null;
 		}
+		String absolutePath = toAbsolutePath(path);
 		switch(getExtensionName(pageFile)) {
-		case "md":
-			return new MarkdownPageResource(pageFile);
-			
-		case "html":
-			return new HtmlPageResource(pageFile);
-			
-		case "htm":
-			return new HtmlPageResource(pageFile);
-			
-		default:
-			return null;
+			case "md":
+				return new MarkdownPageResource(pageFile, absolutePath);
+
+			case "html":
+				return new HtmlPageResource(pageFile, absolutePath);
+
+			case "htm":
+				return new HtmlPageResource(pageFile, absolutePath);
+
+			default:
+				return null;
+		}
+	}
+
+	private boolean isAbsolutePath(String path) {
+		return path.startsWith("/");
+	}
+
+	private String toAbsolutePath(String relativePath) {
+		if (isAbsolutePath(relativePath)) {
+			return relativePath;
+		} else {
+			String resourcePath = this.sourceDir.getAbsolutePath().substring(
+					rootResourceManager.sourceDir.getAbsolutePath().length()
+			);
+			resourcePath = resourcePath.replaceAll("(^/|/$)", "");
+			relativePath = relativePath.replaceAll("(^/|/$)", "");
+			return "/"+ resourcePath + "/" + relativePath;
 		}
 	}
 
 	private File getPageFile(String path) {
-		path = clearExtensionName(path);
-		File pageFile = null;
-		for(String extensionName:ResourceTemplateExtensionNames) {
-			File file = new File(sourceDir.getPath(), path + "." + extensionName);
-			if(file.exists() && file.isFile()) {
-				pageFile = file;
+		if (isAbsolutePath(path)) {
+			return rootResourceManager.getPageFile(path.substring(1));
+		} else {
+			path = clearExtensionName(path);
+			File pageFile = null;
+			for(String extensionName:ResourceTemplateExtensionNames) {
+				File file = new File(sourceDir.getPath(), path + "." + extensionName);
+				if(file.exists() && file.isFile()) {
+					pageFile = file;
+				}
 			}
+			return pageFile;
 		}
-		return pageFile;
 	}
 
 	private String clearExtensionName(String path) {
@@ -59,11 +89,15 @@ public class ResourceManager {
 	}
 	
 	public ResourceManager dir(String path) {
-		File dir = new File(sourceDir.getPath(), path);
-		if(!dir.exists() && !dir.isDirectory()) {
-			throw new ResourceException("directory not found '"+ path +"'.");
+		if (isAbsolutePath(path)) {
+			return rootResourceManager.dir(path.substring(1));
+		} else {
+			File dir = new File(sourceDir.getPath(), path);
+			if(!dir.exists() && !dir.isDirectory()) {
+				throw new ResourceException("directory not found '"+ path +"'.");
+			}
+			return new ResourceManager(dir, this);
 		}
-		return new ResourceManager(dir);
 	}
 	
 	public ResourceManager[] dirs() {
@@ -78,7 +112,7 @@ public class ResourceManager {
 		List<ResourceManager> dirsList = new LinkedList<ResourceManager>();
 		for(File file:sourceDir.listFiles()) {
 			if(file.isDirectory()) {
-				dirsList.add(new ResourceManager(file));
+				dirsList.add(new ResourceManager(file, this));
 			}
 		}
 		return dirsList.toArray(new ResourceManager[dirsList.size()]);

@@ -8,10 +8,12 @@ import java.io.Reader;
 
 public abstract class AbstractPageResource extends ResourceFileWithHead {
 
+	private final String resourcePath;
 	private String contentCache = null;
 
-	AbstractPageResource(File resourceFile) {
+	AbstractPageResource(File resourceFile, String resourcePath) {
 		super(resourceFile);
+		this.resourcePath = resourcePath;
 	}
 
 	public String getHtmlContent() throws IOException {
@@ -25,6 +27,10 @@ public abstract class AbstractPageResource extends ResourceFileWithHead {
 
 	public String getTextContent() throws IOException {
 		return Jsoup.parse(getHtmlContent()).text().replaceAll("\\s+", " ");
+	}
+
+	public String getPath() {
+		return resourcePath;
 	}
 
 	public String getName() {

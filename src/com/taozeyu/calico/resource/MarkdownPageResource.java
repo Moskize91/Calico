@@ -10,8 +10,8 @@ public class MarkdownPageResource extends AbstractPageResource {
 
 	private static final MarkdownProcessor MarkdwonProcessor = new MarkdownProcessor();
 	
-	MarkdownPageResource(File resourceFile) {
-		super(resourceFile);
+	MarkdownPageResource(File resourceFile, String resourcePath) {
+		super(resourceFile, resourcePath);
 	}
 
 	@Override
