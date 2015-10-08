@@ -1,16 +1,6 @@
 package com.taozeyu.calico.generator;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,18 +57,28 @@ public class FileGenerator {
 	}
 
 	private void generateTargetFile(File targetDir, ScriptEngine jse) throws ScriptException, IOException {
-		Writer writer = getTargetFileWriter(targetDir);
+
+		boolean autoFlush = false;
+		PrintStream printStream = new PrintStream(
+				getTargetFileOutputStream(targetDir), autoFlush,
+				GlobalConifg.instance.getCharset().name());
 		Reader reader = getTemplateReader();
-		
+
 		try {
-		    jse.getContext().setWriter(writer);
-		    jse.eval(getFileContentFromReader(reader));
+		    jse.put("__printStream", printStream);
+			setPrintStreamToEngin(jse, printStream);
+			jse.eval(getFileContentFromReader(reader));
 		    
 		} finally {
-			writer.flush();
-			writer.close();
+			printStream.flush();
+			printStream.close();
 			reader.close();
 		}
+	}
+
+	private void setPrintStreamToEngin(ScriptEngine jse, PrintStream printStream) throws ScriptException {
+		jse.eval("Output = __printStream;");
+		jse.eval("__printStream = undefined;");
 	}
 
 	// Nashorn engine would omit some content if read from a long stream.
@@ -92,15 +92,10 @@ public class FileGenerator {
 	    return sb.toString();
 	}
 	
-	private Writer getTargetFileWriter(File targetDir) throws FileNotFoundException {
+	private OutputStream getTargetFileOutputStream(File targetDir) throws FileNotFoundException {
 		File targetFile = getTargetFile(targetDir);
 		targetFile.getParentFile().mkdirs();
-		
-		Writer writer = new OutputStreamWriter(
-				new FileOutputStream(targetFile),
-				GlobalConifg.instance.getCharset()
-		);
-		return writer;
+		return new FileOutputStream(targetFile);
 	}
 
 	private File getTargetFile(File targetDir) {

@@ -14,6 +14,7 @@ public class JavaScriptLoader {
 
     private static String[] SystemLibNames = new String[] {
             "resource_manager",
+            "print_stream",
             "pages_constructor",
     };
 
