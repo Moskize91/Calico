@@ -65,7 +65,6 @@ public class FileGenerator {
 		Reader reader = getTemplateReader();
 
 		try {
-		    jse.put("__printStream", printStream);
 			setPrintStreamToEngin(jse, printStream);
 			jse.eval(getFileContentFromReader(reader));
 		    
@@ -77,6 +76,7 @@ public class FileGenerator {
 	}
 
 	private void setPrintStreamToEngin(ScriptEngine jse, PrintStream printStream) throws ScriptException {
+		jse.put("__printStream", printStream);
 		jse.eval("Output = __printStream;");
 		jse.eval("__printStream = undefined;");
 	}
