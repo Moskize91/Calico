@@ -16,6 +16,7 @@ public class JavaScriptLoader {
             "resource_manager",
             "print_stream",
             "pages_constructor",
+            "params_helper",
     };
 
     private static final int BufferedSize = 1024;
