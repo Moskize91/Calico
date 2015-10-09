@@ -26,7 +26,7 @@ public class PathUtil {
     }
 
     public static String getExtensionName(String path) {
-        return getExtensionName(path, null);
+        return getExtensionName(path, "html");
     }
 
     public static String getExtensionName(String path, String holderExtensionName) {

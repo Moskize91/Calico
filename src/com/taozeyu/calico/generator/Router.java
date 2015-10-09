@@ -71,11 +71,11 @@ public class Router {
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
 		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
 		File templatePath = getTemplatePath(path, extensionName);
-		if (templatePath == null) {
-			return null;
+		if (templatePath != null) {
+			String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
+			return new PageService(resource, templatePath, routeDir, params);
 		}
-		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
-		return new PageService(resource, templatePath, routeDir, params);
+		return null;
 	}
 
 	private String getTemplateDirPath(String[] pathCells, int endOfExistDirIndex) {
