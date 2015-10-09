@@ -46,13 +46,39 @@ public class Main {
 		new ContentBuilder(router, targetPath).buildFromRootFile();
 	}
 
-	private static void service(Router router) throws IOException {
-		new WebService(router).start();
+	private static void service(Router router) throws IOException, InterruptedException {
+		final WebService webService = new WebService(router);
+		webService.start();
+		System.out.println( "\nRunning! Point your browser to http://127.0.0.1:"+ webService.getListeningPort() +"/ \n" );
+		waitForCtrlCHook(new Runnable() {
+			@Override
+			public void run() {
+				webService.closeAllConnections();
+				System.out.println("Press Ctrl+C to shutdown service.");
+			}
+		});
 	}
 
 	private static void checkArgs(String[] args) {
-		if (args.length != 0) {
+		if (args.length != 1) {
 			throw new RuntimeException("Need just only ONE argument!");
+		}
+	}
+
+	private static void waitForCtrlCHook(Runnable whenShutdown) throws InterruptedException {
+		final Object waitForHookLock = new Object();
+		Thread hookThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				whenShutdown.run();
+				synchronized (waitForHookLock) {
+					waitForHookLock.notifyAll();
+				}
+			}
+		});
+		Runtime.getRuntime().addShutdownHook(hookThread);
+		synchronized (waitForHookLock) {
+			waitForHookLock.wait();
 		}
 	}
 }
