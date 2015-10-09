@@ -15,7 +15,7 @@ public class MarkdownPageResource extends AbstractPageResource {
 	}
 
 	@Override
-	public String createHtmlContent() throws IOException {
+	public String createContent() throws IOException {
 		Reader reader = createResourceFileReaderByJumpOverHead();
 		try {
 			String content = getStringFromReader(reader);

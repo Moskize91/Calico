@@ -1,45 +1,23 @@
 package com.taozeyu.calico.resource;
 
-import com.taozeyu.calico.util.PathUtil;
 import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 
-public abstract class AbstractPageResource extends ResourceFileWithHead {
-
-	private final String resourcePath;
-	private String contentCache = null;
+public abstract class AbstractPageResource extends AbstractResource<String> {
 
 	AbstractPageResource(File resourceFile, String resourcePath) {
-		super(resourceFile);
-		this.resourcePath = resourcePath;
+		super(resourceFile, resourcePath);
 	}
 
 	public String getHtmlContent() throws IOException {
-		if (contentCache == null) {
-			contentCache = createHtmlContent();
-		}
-		return contentCache;
+		return getContent();
 	}
-
-	protected abstract String createHtmlContent() throws IOException;
 
 	public String getTextContent() throws IOException {
 		return Jsoup.parse(getHtmlContent()).text().replaceAll("\\s+", " ");
-	}
-
-	public String getPath() {
-		return resourcePath;
-	}
-
-	public String getName() {
-		return PathUtil.clearExtensionName(getFullName());
-	}
-
-	public String getFullName() {
-		return resourceFile.getName();
 	}
 
 	protected String getStringFromReader(Reader reader) throws IOException {
