@@ -25,6 +25,12 @@ public class WebService extends NanoHTTPD {
     private static String[][] getContentTypeData() {
         // TODO We should add all content-type, See this page http://tool.oschina.net/commons
         return new String[][] {
+
+                // basic resource
+                {"css", "text/css"},
+                {"xml", "text/xml"},
+
+                // art resource
                 {"jpe", "image/jpeg"},
                 {"jpeg", "image/jpeg"},
                 {"jpg", "application/x-jpg"},
@@ -54,10 +60,10 @@ public class WebService extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         try {
-            synchronized (this) {
-                return handleRequest(session);
-            }
+            return handleRequest(session);
+
         } catch (Exception e) {
+            e.printStackTrace();
             return getErrorMessageResponse(INTERNAL_ERROR, "500 Internal Error:"+ e);
         }
     }
@@ -65,8 +71,10 @@ public class WebService extends NanoHTTPD {
     private Response handleRequest(IHTTPSession session) throws IOException, ScriptException {
         String path = session.getUri().toString();
         if (isResourcePath(path)) {
+            System.out.println("Get Request for Resource: " + path);
             return generateResourceResponse(path);
         } else {
+            System.out.println("Get Request for Page: "+ path);
             return generatePageResponse(path);
         }
     }
@@ -81,7 +89,7 @@ public class WebService extends NanoHTTPD {
         return true;
     }
 
-    private Response generatePageResponse(String path) throws IOException, ScriptException {
+    private synchronized Response generatePageResponse(String path) throws IOException, ScriptException {
         PageService pageService = router.getPageService(path);
         if (pageService == null) {
             return getErrorMessageResponse(NOT_FOUND, "404 Page Not Found:"+ path);
@@ -93,7 +101,7 @@ public class WebService extends NanoHTTPD {
 
     private Response generateResourceResponse(String path) throws FileNotFoundException {
         File resourceFile = router.getFile(path);
-        if (isFile(resourceFile)) {
+        if (!isFile(resourceFile)) {
             return getErrorMessageResponse(NOT_FOUND, "404 Resource Not Found:"+ path);
         }
         String contentType = getContentTypeByExtensionName(PathUtil.getExtensionName(path));
@@ -107,6 +115,7 @@ public class WebService extends NanoHTTPD {
 
     private Response getErrorMessageResponse(Response.IStatus state, String errorMessage) {
         String contentType = "text/html";
+        System.err.println(errorMessage);
         return new Response(state, contentType, errorMessage);
     }
 
