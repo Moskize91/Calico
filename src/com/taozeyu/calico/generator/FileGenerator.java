@@ -7,6 +7,7 @@ import java.util.List;
 import javax.script.ScriptException;
 
 import com.taozeyu.calico.GlobalConfig;
+import com.taozeyu.calico.util.PrintStreamAdapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,7 +31,7 @@ public class FileGenerator {
 	private void generateTargetFile(File targetDir) throws ScriptException, IOException {
 
 		boolean autoFlush = false;
-		PrintStream printStream = new PrintStream(
+		PrintStreamAdapter printStream = new PrintStreamAdapter(
 				getTargetFileOutputStream(targetDir), autoFlush,
 				GlobalConfig.instance().getCharset().name());
 

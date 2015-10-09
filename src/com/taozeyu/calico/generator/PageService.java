@@ -26,7 +26,7 @@ public class PageService {
         this.params = params;
     }
 
-    public void requestPage(PrintStream printStream) throws IOException, ScriptException {
+    public void requestPage(Printer printStream) throws IOException, ScriptException {
         ScriptEngine engine = createScriptEngine();
         try (Reader reader = getTemplateReader()){
             setPrintStreamToEngin(engine, printStream);
@@ -47,7 +47,7 @@ public class PageService {
         return engine;
     }
 
-    private void setPrintStreamToEngin(ScriptEngine jse, PrintStream printStream) throws ScriptException {
+    private void setPrintStreamToEngin(ScriptEngine jse, Printer printStream) throws ScriptException {
         jse.put("__printStream", printStream);
         jse.eval("Output = __printStream;");
         jse.eval("__printStream = undefined;");
