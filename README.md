@@ -32,5 +32,6 @@ R.page("log/2015-01-02-hello-world");
 
 # 使用的库：
 
- - jsoup-1.8.1
+ - Jsoup-1.8.1
  - markdown-0.4.1
+ - NanoHTTPD-2.1.1
