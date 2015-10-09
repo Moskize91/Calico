@@ -18,11 +18,18 @@ public class Router {
 		this.routeDir = routeDir;
 		this.rootMapToPath = rootMapToPath;
 	}
-	
+
+	public File getFile(String relativePath) {
+		return new File(routeDir.getPath(), relativePath);
+	}
+
 	public FileGenerator getFileGenerator(String absolutePath) {
 
 		String targetPath = getNormalizeTargetPath(absolutePath);
 		PageService pageService = getPageServiceWithNormalizeTargetPath(targetPath);
+		if (pageService == null) {
+			throw new RouteException("No template file map to '"+ absolutePath +"'.");
+		}
 		return new FileGenerator(pageService, new File(targetPath));
 	}
 
@@ -51,7 +58,7 @@ public class Router {
 		} else {
 			String extensionName = PathUtil.getExtensionName(absolutePath);
 			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
-			return createPageService(absolutePath, pathCells, extensionName);
+			return createPageService(pathCells, extensionName);
 		}
 	}
 
@@ -59,13 +66,13 @@ public class Router {
 		return path.replaceAll("^/", "").replaceAll("/$", "");
 	}
 
-	private PageService createPageService(String absolutePath, String[] pathCells, String extensionName) {
+	private PageService createPageService(String[] pathCells, String extensionName) {
 		
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
 		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
 		File templatePath = getTemplatePath(path, extensionName);
 		if (templatePath == null) {
-			throw new RouteException("No template file map to '"+ absolutePath +"'.");
+			return null;
 		}
 		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
 		return new PageService(resource, templatePath, routeDir, params);
@@ -97,7 +104,7 @@ public class Router {
 	}
 
 	private boolean isFileExist(File path) {
-		return new File(routeDir.getPath(), path.getPath()).exists();
+		return getFile(path.getPath()).exists();
 	}
 
 	private String selectParamsFromPath(String pathCells[], int startIndex) {
