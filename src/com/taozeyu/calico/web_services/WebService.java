@@ -9,6 +9,8 @@ import fi.iki.elonen.NanoHTTPD;
 
 import javax.script.ScriptException;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
 
@@ -16,6 +18,27 @@ import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
  * Created by taozeyu on 15/10/9.
  */
 public class WebService extends NanoHTTPD {
+
+    private static final Map<String, String> ContentTypeMap = new HashMap<>();
+    private static final String UnknownType = "application/octet-stream";
+
+    private static String[][] getContentTypeData() {
+        // TODO We should add all content-type, See this page http://tool.oschina.net/commons
+        return new String[][] {
+                {"jpe", "image/jpeg"},
+                {"jpeg", "image/jpeg"},
+                {"jpg", "application/x-jpg"},
+                {"gif", "image/gif"},
+                {"png", "application/x-png"},
+        };
+    }
+
+    static {
+        String[][] contentTypeData = getContentTypeData();
+        for (String[] data : contentTypeData) {
+            ContentTypeMap.put(data[0], data[1]);
+        }
+    }
 
     private static final String[] NotResourceExtensionNames = new String[] {
         "html", "htm", "",
@@ -88,6 +111,10 @@ public class WebService extends NanoHTTPD {
     }
 
     private String getContentTypeByExtensionName(String extensionName) {
-        return "";
+        String contentType = ContentTypeMap.get(extensionName.trim().toLowerCase());
+        if (contentType == null) {
+            contentType = UnknownType;
+        }
+        return contentType;
     }
 }
