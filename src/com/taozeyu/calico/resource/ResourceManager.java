@@ -33,7 +33,7 @@ public class ResourceManager {
 			return null;
 		}
 		String absolutePath = toAbsolutePath(path);
-		switch(getExtensionName(pageFile)) {
+		switch(PathUtil.getExtensionName(pageFile.getName())) {
 			case "md":
 				return new MarkdownPageResource(pageFile, absolutePath);
 
@@ -65,7 +65,7 @@ public class ResourceManager {
 		if (PathUtil.isAbsolutePath(path)) {
 			return rootResourceManager.getPageFile(path.substring(1));
 		} else {
-			path = clearExtensionName(path);
+			path = PathUtil.clearExtensionName(path);
 			File pageFile = null;
 			for(String extensionName:ResourceTemplateExtensionNames) {
 				File file = new File(sourceDir.getPath(), path + "." + extensionName);
@@ -77,15 +77,6 @@ public class ResourceManager {
 		}
 	}
 
-	private String clearExtensionName(String path) {
-		return path.replaceAll("\\.(\\w|\\-)+$", "");
-	}
-	
-	private String getExtensionName(File pageFile) {
-		String name = pageFile.getName();
-		return name.substring(name.lastIndexOf('.') + 1);
-	}
-	
 	public ResourceManager dir(String path) {
 		if (PathUtil.isAbsolutePath(path)) {
 			return rootResourceManager.dir(path.substring(1));

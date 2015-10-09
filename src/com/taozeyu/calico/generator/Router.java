@@ -1,8 +1,6 @@
 package com.taozeyu.calico.generator;
 
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.taozeyu.calico.resource.ResourceManager;
 import com.taozeyu.calico.util.PathUtil;
@@ -51,21 +49,10 @@ public class Router {
 			return new PageService(resource, targetPathTemplateFile, routeDir, params);
 			
 		} else {
-			String extensionName = getExtensionName(absolutePath);
+			String extensionName = PathUtil.getExtensionName(absolutePath);
 			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
 			return createPageService(absolutePath, pathCells, extensionName);
 		}
-	}
-
-	private String getExtensionName(String path) {
-		String extensionName;
-		Matcher matcher = Pattern.compile("\\.(\\w|\\-)+$").matcher(path);
-		if(matcher.find()) {
-			extensionName = matcher.group().replaceAll("^\\.", "");
-		} else {
-			extensionName = "html";
-		}
-		return extensionName;
 	}
 
 	private String clearHeadTailSlash(String path) {

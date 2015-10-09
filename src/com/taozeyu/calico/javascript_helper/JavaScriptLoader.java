@@ -56,10 +56,6 @@ public class JavaScriptLoader {
         }
     }
 
-    private boolean isExtensionNameJs(File file) {
-        return file.getName().matches(".+\\.(?i)js$");
-    }
-
     private Reader getReaderFromFile(InputStream inputStream) {
         return  new InputStreamReader(new BufferedInputStream(inputStream, BufferedSize), LibraryCharset);
     }
