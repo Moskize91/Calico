@@ -64,15 +64,12 @@ public class Main {
 
 	private static void waitForCtrlCHook(Runnable whenShutdown) throws InterruptedException {
 		final Object waitForHookLock = new Object();
-		Thread hookThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				whenShutdown.run();
-				synchronized (waitForHookLock) {
-					waitForHookLock.notifyAll();
-				}
-			}
-		});
+		Thread hookThread = new Thread(() -> {
+            whenShutdown.run();
+            synchronized (waitForHookLock) {
+                waitForHookLock.notifyAll();
+            }
+        });
 		Runtime.getRuntime().addShutdownHook(hookThread);
 		synchronized (waitForHookLock) {
 			waitForHookLock.wait();
