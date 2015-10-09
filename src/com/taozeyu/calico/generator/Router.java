@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.util.PathUtil;
 
 public class Router {
 
@@ -22,7 +23,7 @@ public class Router {
 	
 	public FileGenerator getFileGenerator(String absolutePath) {
 
-		String targetPath = normalizePath(absolutePath);
+		String targetPath = PathUtil.normalizePath(absolutePath);
 
 		if(targetPath.equals(RootPath)) {
 			targetPath = rootMapToPath;
@@ -58,10 +59,6 @@ public class Router {
 		return path.replaceAll("^/", "").replaceAll("/$", "");
 	}
 
-	private String normalizePath(String absolutePath) {
-		return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+/?)?$", "");
-	}
-	
 	private FileGenerator createFileGenerator(String absolutePath, String[] pathCells, String extensionName) {
 		
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);

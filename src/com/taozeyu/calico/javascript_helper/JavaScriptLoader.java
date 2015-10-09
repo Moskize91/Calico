@@ -1,6 +1,8 @@
 package com.taozeyu.calico.javascript_helper;
 
+import com.taozeyu.calico.GlobalConfig;
 import com.taozeyu.calico.SystemJavaScriptLog;
+import com.taozeyu.calico.util.PathUtil;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -28,12 +30,15 @@ public class JavaScriptLoader {
 
         loadLogObject(engine);
         ClassLoader loader = getClass().getClassLoader();
-
+        File debugWorkingDirectory = GlobalConfig.instance().getFile(
+                "debug-working-directory", System.getProperty("user.dir"));
         for (String libName : SystemLibNames) {
             String path = LibraryPath +"/"+ libName +".js";
             InputStream is = loader.getResourceAsStream(path);
             if (is == null) {
-                File file = new File(System.getProperty("user.dir"), path);
+                // when class loader can't find resource,
+                // it means that the program is not running at jar package.
+                File file = PathUtil.getFile(path, debugWorkingDirectory.getPath());
                 is = new FileInputStream(file);
             }
             loadJavaScript(is, engine);

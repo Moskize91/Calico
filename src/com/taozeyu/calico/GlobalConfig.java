@@ -1,5 +1,7 @@
 package com.taozeyu.calico;
 
+import com.taozeyu.calico.util.PathUtil;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -39,7 +41,7 @@ public class GlobalConfig {
     private File getConfigFile() throws FileNotFoundException {
         File file = new File(System.getProperty("user.dir"), ".calico");
         if (!file.exists() || !file.isFile()) {
-            throw new FileNotFoundException("File not found : .calico");
+            throw new FileNotFoundException("File not found : "+ file.getPath());
         }
         return file;
     }
@@ -78,7 +80,7 @@ public class GlobalConfig {
         return configFile.getParentFile();
     }
 
-    public String getValue(String name, String defaultValue) {
+    public String getString(String name, String defaultValue) {
         String value = configMap.get(name);
         if (value == null) {
             value = defaultValue;
@@ -86,7 +88,15 @@ public class GlobalConfig {
         return value;
     }
 
-    public String getValue(String name) {
+    public String getString(String name) {
         return configMap.get(name);
+    }
+
+    public File getFile(String name, String defaultValue) {
+        return PathUtil.getFile(getString(name, defaultValue), configFileDir().getPath());
+    }
+
+    public File getFile(String name) {
+        return PathUtil.getFile(getString(name), configFileDir().getPath());
     }
 }

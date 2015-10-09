@@ -1,5 +1,7 @@
 package com.taozeyu.calico.resource;
 
+import com.taozeyu.calico.util.PathUtil;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,12 +48,8 @@ public class ResourceManager {
 		}
 	}
 
-	private boolean isAbsolutePath(String path) {
-		return path.startsWith("/");
-	}
-
 	private String toAbsolutePath(String relativePath) {
-		if (isAbsolutePath(relativePath)) {
+		if (PathUtil.isAbsolutePath(relativePath)) {
 			return relativePath;
 		} else {
 			String resourcePath = this.sourceDir.getAbsolutePath().substring(
@@ -64,7 +62,7 @@ public class ResourceManager {
 	}
 
 	private File getPageFile(String path) {
-		if (isAbsolutePath(path)) {
+		if (PathUtil.isAbsolutePath(path)) {
 			return rootResourceManager.getPageFile(path.substring(1));
 		} else {
 			path = clearExtensionName(path);
@@ -89,7 +87,7 @@ public class ResourceManager {
 	}
 	
 	public ResourceManager dir(String path) {
-		if (isAbsolutePath(path)) {
+		if (PathUtil.isAbsolutePath(path)) {
 			return rootResourceManager.dir(path.substring(1));
 		} else {
 			File dir = new File(sourceDir.getPath(), path);
