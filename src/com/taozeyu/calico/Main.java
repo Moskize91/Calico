@@ -6,23 +6,23 @@ import com.taozeyu.calico.copier.ResourceFileCopier;
 import com.taozeyu.calico.copier.TargetDirectoryCleaner;
 import com.taozeyu.calico.generator.Router;
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.util.PathUtil;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
 
-		File projectPath = getDirFromPath(getElementFromArgs(args, 0, "./"));
-		File targetPath = getDirFromPath(getElementFromArgs(args, 1, "./"));
-		String rootMapToPath = normalizePath(getElementFromArgs(args, 2, "/index.html"));
+		File targetPath = GlobalConfig.instance().getFile("target", "./");
+		String rootMapToPath = GlobalConfig.instance().getString("root", "/index.html");
 		
-		File rootPath = new File(projectPath.getPath(), "template");
-		File resourcePath = new File(projectPath.getPath(), "resource");
+		File templatePath = GlobalConfig.instance().getFile("template", "./template");
+		File resourcePath = GlobalConfig.instance().getFile("resource", "./resource");
 		
 		ResourceManager resource = new ResourceManager(resourcePath);
-		Router router = new Router(resource, rootPath, rootMapToPath);
+		Router router = new Router(resource, templatePath, rootMapToPath);
 
 		new TargetDirectoryCleaner(targetPath).clean();
-		new ResourceFileCopier(rootPath, targetPath).copy();
+		new ResourceFileCopier(templatePath, targetPath).copy();
 		new ContentBuilder(router, targetPath).buildFromRootFile();
 	}
 
@@ -36,7 +36,7 @@ public class Main {
 
 	private static File getDirFromPath(String path) {
 		File file;
-		if(isAbsolutePath(path)) {
+		if(PathUtil.isAbsolutePath(path)) {
 			file = new File(path);
 		} else {
 			path = path.replaceAll("^\\./", "");
@@ -46,10 +46,6 @@ public class Main {
 			throw new RuntimeException("directory not found " + file.getPath() +".");
 		}
 		return file;
-	}
-
-	private static boolean isAbsolutePath(String path) {
-		return path.matches("([a-zA-Z]+:)?(\\\\|/).*");
 	}
 
 	private static String normalizePath(String path) {
