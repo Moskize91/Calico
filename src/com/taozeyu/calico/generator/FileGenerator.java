@@ -11,17 +11,15 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.taozeyu.calico.resource.ResourceManager;
-
 public class FileGenerator {
 
 	private final PageService pageService;
 
 	private final File absolutePath;
 	
-	FileGenerator(ResourceManager resource, File absolutePath, File templatePath, File routeDir, String params) {
+	FileGenerator(PageService pageService, File absolutePath) {
+		this.pageService = pageService;
 		this.absolutePath = absolutePath;
-		this.pageService = new PageService(resource, templatePath, routeDir, params);
 	}
 
 	public List<String> generateAndGetPageLinkList(File targetDir) throws IOException, ScriptException {

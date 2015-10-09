@@ -23,24 +23,37 @@ public class Router {
 	
 	public FileGenerator getFileGenerator(String absolutePath) {
 
+		String targetPath = getNormalizeTargetPath(absolutePath);
+		PageService pageService = getPageServiceWithNormalizeTargetPath(targetPath);
+		return new FileGenerator(pageService, new File(targetPath));
+	}
+
+	public PageService getPageService(String absolutePath) {
+
+		String targetPath = getNormalizeTargetPath(absolutePath);
+		return getPageServiceWithNormalizeTargetPath(targetPath);
+	}
+
+	private String getNormalizeTargetPath(String absolutePath) {
+
 		String targetPath = PathUtil.normalizePath(absolutePath);
 
 		if(targetPath.equals(RootPath)) {
 			targetPath = rootMapToPath;
 		}
-		return useAbsoluteTemplateOrUseParams(targetPath);
+		return targetPath;
 	}
 
-	private FileGenerator useAbsoluteTemplateOrUseParams(String targetPath) {
-		File targetPathTemplateFile = new File(routeDir, targetPath);
+	private PageService getPageServiceWithNormalizeTargetPath(String absolutePath) {
+		File targetPathTemplateFile = new File(routeDir, absolutePath);
 		if(targetPathTemplateFile.exists()) {
 			String params = "";
-			return new FileGenerator(resource, new File(targetPath), targetPathTemplateFile, routeDir, params);
+			return new PageService(resource, targetPathTemplateFile, routeDir, params);
 			
 		} else {
-			String extensionName = getExtensionName(targetPath);
-			String pathCells[] = clearHeadTailSlash(targetPath).split("/");
-			return createFileGenerator(targetPath, pathCells, extensionName);
+			String extensionName = getExtensionName(absolutePath);
+			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
+			return createPageService(absolutePath, pathCells, extensionName);
 		}
 	}
 
@@ -59,7 +72,7 @@ public class Router {
 		return path.replaceAll("^/", "").replaceAll("/$", "");
 	}
 
-	private FileGenerator createFileGenerator(String absolutePath, String[] pathCells, String extensionName) {
+	private PageService createPageService(String absolutePath, String[] pathCells, String extensionName) {
 		
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
 		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
@@ -68,7 +81,7 @@ public class Router {
 			throw new RouteException("No template file map to '"+ absolutePath +"'.");
 		}
 		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
-		return new FileGenerator(resource, new File(absolutePath), templatePath, routeDir, params);
+		return new PageService(resource, templatePath, routeDir, params);
 	}
 
 	private String getTemplateDirPath(String[] pathCells, int endOfExistDirIndex) {
