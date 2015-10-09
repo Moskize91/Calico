@@ -92,11 +92,24 @@ public class GlobalConfig {
         return configMap.get(name);
     }
 
+    public File getFile(String name) {
+        return getFile(name, "");
+    }
+
     public File getFile(String name, String defaultValue) {
         return PathUtil.getFile(getString(name, defaultValue), configFileDir().getPath());
     }
 
-    public File getFile(String name) {
-        return PathUtil.getFile(getString(name), configFileDir().getPath());
+    public int getInt(String name) {
+        return getInt(name, 0);
+    }
+
+    public int getInt(String name, int defaultValue) {
+        String value = getString(name);
+        if (value != null) {
+            return Integer.valueOf(value);
+        } else {
+            return defaultValue;
+        }
     }
 }
