@@ -7,6 +7,7 @@ import com.taozeyu.calico.copier.ResourceFileCopier;
 import com.taozeyu.calico.copier.TargetDirectoryCleaner;
 import com.taozeyu.calico.generator.Router;
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.web_services.WebService;
 
 import javax.script.ScriptException;
 
@@ -45,8 +46,8 @@ public class Main {
 		new ContentBuilder(router, targetPath).buildFromRootFile();
 	}
 
-	private static void service(Router router) {
-
+	private static void service(Router router) throws IOException {
+		new WebService(router).start();
 	}
 
 	private static void checkArgs(String[] args) {
