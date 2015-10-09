@@ -9,12 +9,12 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.taozeyu.calico.GlobalConfig;
 import com.taozeyu.calico.javascript_helper.JavaScriptLoader;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.taozeyu.calico.GlobalConifg;
 import com.taozeyu.calico.resource.ResourceManager;
 
 public class FileGenerator {
@@ -61,7 +61,7 @@ public class FileGenerator {
 		boolean autoFlush = false;
 		PrintStream printStream = new PrintStream(
 				getTargetFileOutputStream(targetDir), autoFlush,
-				GlobalConifg.instance.getCharset().name());
+				GlobalConfig.instance().getCharset().name());
 		Reader reader = getTemplateReader();
 
 		try {
@@ -142,7 +142,7 @@ public class FileGenerator {
 
 	private Document getDocumentFromTargetFile(File targetDir) throws IOException {
 		File targetFile = getTargetFile(targetDir);
-		String charsetName = GlobalConifg.instance.getCharset().name();
+		String charsetName = GlobalConfig.instance().getCharset().name();
 		Document doc = Jsoup.parse(targetFile, charsetName);
 		return doc;
 	}

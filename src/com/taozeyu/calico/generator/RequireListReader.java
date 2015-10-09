@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.regex.Pattern;
 
-import com.taozeyu.calico.GlobalConifg;
+import com.taozeyu.calico.GlobalConfig;
 
 
 class RequireListReader extends AllowFillReader {
@@ -55,7 +55,7 @@ class RequireListReader extends AllowFillReader {
 	private Reader createReader(File file) throws FileNotFoundException {
 		InputStream inputStream = new FileInputStream(file);
 		inputStream = new BufferedInputStream(inputStream, BufferedSize);
-		return new InputStreamReader(inputStream, GlobalConifg.instance.getCharset());
+		return new InputStreamReader(inputStream, GlobalConfig.instance().getCharset());
 	}
 	
 	@Override
