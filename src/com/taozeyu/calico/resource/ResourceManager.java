@@ -27,7 +27,7 @@ public class ResourceManager {
 		this.rootResourceManager = rootResourceManager;
 	}
 
-	public AbstractPageResource page(String path) {
+	public AbstractResource page(String path) {
 		File pageFile = getPageFile(path);
 		if(pageFile == null) {
 			return null;
@@ -44,7 +44,7 @@ public class ResourceManager {
 				return new HtmlPageResource(pageFile, absolutePath);
 
 			default:
-				return null;
+				return new TextResource(pageFile, absolutePath);
 		}
 	}
 
@@ -107,11 +107,11 @@ public class ResourceManager {
 		return dirsList.toArray(new ResourceManager[dirsList.size()]);
 	}
 
-	public AbstractPageResource[] pages() {
-		List<AbstractPageResource> pagesList = new LinkedList<AbstractPageResource>();
+	public AbstractResource[] pages() {
+		List<AbstractResource> pagesList = new LinkedList<AbstractResource>();
 		for(File file:sourceDir.listFiles()) {
 			if(!file.isDirectory()) {
-				AbstractPageResource page = page(file.getName());
+				AbstractResource page = page(file.getName());
 				// if page's extend name can't recognize, it should ignore.
 				if (page != null) {
 					pagesList.add(page);
@@ -121,10 +121,10 @@ public class ResourceManager {
 		return pagesList.toArray(new AbstractPageResource[pagesList.size()]);
 	}
 
-	public AbstractPageResource[] allPages() {
-		List<AbstractPageResource> pagesList = new LinkedList<AbstractPageResource>();
+	public AbstractResource[] allPages() {
+		List<AbstractResource> pagesList = new LinkedList<AbstractResource>();
 		for (ResourceManager resourceManager : dirs()) {
-			for (AbstractPageResource page : resourceManager.pages()) {
+			for (AbstractResource page : resourceManager.pages()) {
 				pagesList.add(page);
 			}
 		}

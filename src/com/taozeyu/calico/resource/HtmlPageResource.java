@@ -12,11 +12,8 @@ class HtmlPageResource extends AbstractPageResource {
 
 	@Override
 	public String createContent() throws IOException {
-		Reader reader = createResourceFileReaderByJumpOverHead();
-		try {
+		try (Reader reader = createResourceFileReaderByJumpOverHead()) {
 			return getStringFromReader(reader);
-		} finally {
-			reader.close();
 		}
 	}
 

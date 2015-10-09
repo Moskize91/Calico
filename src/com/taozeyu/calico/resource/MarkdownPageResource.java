@@ -16,13 +16,9 @@ public class MarkdownPageResource extends AbstractPageResource {
 
 	@Override
 	public String createContent() throws IOException {
-		Reader reader = createResourceFileReaderByJumpOverHead();
-		try {
+		try (Reader reader = createResourceFileReaderByJumpOverHead()) {
 			String content = getStringFromReader(reader);
 			return MarkdwonProcessor.markdown(content);
-			
-		} finally {
-			reader.close();
 		}
 	}
 

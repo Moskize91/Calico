@@ -20,15 +20,6 @@ public abstract class AbstractPageResource extends AbstractResource<String> {
 		return Jsoup.parse(getHtmlContent()).text().replaceAll("\\s+", " ");
 	}
 
-	protected String getStringFromReader(Reader reader) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		int ch;
-		while((ch = reader.read()) >= 0) {
-			sb.append((char) ch);
-		}
-		return sb.toString();
-	}
-
 	public String getAbstractContent() throws IOException {
 		return getAbstractContent(365);
 	}

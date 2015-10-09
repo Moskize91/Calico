@@ -4,6 +4,7 @@ import com.taozeyu.calico.util.PathUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 
 /**
  * Created by taozeyu on 15/10/9.
@@ -20,11 +21,20 @@ abstract class AbstractResource<CONTENT> extends ResourceFileWithHead {
 
     protected abstract CONTENT createContent() throws IOException;
 
-    protected CONTENT getContent() throws IOException {
+    protected final CONTENT getContent() throws IOException {
         if (contentCache == null) {
             contentCache = createContent();
         }
         return contentCache;
+    }
+
+    protected final String getStringFromReader(Reader reader) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int ch;
+        while((ch = reader.read()) >= 0) {
+            sb.append((char) ch);
+        }
+        return sb.toString();
     }
 
     public String getPath() {
