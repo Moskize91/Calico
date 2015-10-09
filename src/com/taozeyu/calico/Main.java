@@ -50,13 +50,10 @@ public class Main {
 		final WebService webService = new WebService(router);
 		webService.start();
 		System.out.println( "\nRunning! Point your browser to http://127.0.0.1:"+ webService.getListeningPort() +"/ \n" );
-		waitForCtrlCHook(new Runnable() {
-			@Override
-			public void run() {
-				webService.closeAllConnections();
-				System.out.println("Press Ctrl+C to shutdown service.");
-			}
-		});
+		waitForCtrlCHook(() -> {
+            webService.closeAllConnections();
+            System.out.println("Press Ctrl+C to shutdown service.");
+        });
 	}
 
 	private static void checkArgs(String[] args) {
