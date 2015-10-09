@@ -14,7 +14,7 @@ public class ResourceManager {
 	private ResourceManager[] dirs = null;
 	
 	private static final String ResourceTemplateExtensionNames[] = new String[] {
-		"md", "html", "htm"
+		"md", "html", "htm", "json",
 	};
 	
 	public ResourceManager(File sourceDir) {
@@ -25,6 +25,15 @@ public class ResourceManager {
 	private ResourceManager(File sourceDir, ResourceManager rootResourceManager) {
 		this.sourceDir = sourceDir;
 		this.rootResourceManager = rootResourceManager;
+	}
+
+	public AbstractResource getResource(String path) {
+		File pageFile = getPageFile(path);
+		if(pageFile == null) {
+			return null;
+		}
+		String absolutePath = toAbsolutePath(path);
+		return new TextResource(pageFile, absolutePath);
 	}
 
 	public AbstractResource page(String path) {
@@ -44,7 +53,7 @@ public class ResourceManager {
 				return new HtmlPageResource(pageFile, absolutePath);
 
 			default:
-				return new TextResource(pageFile, absolutePath);
+				return null;
 		}
 	}
 

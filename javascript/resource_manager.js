@@ -6,6 +6,14 @@ var R;
 
         var R = {};
 
+        R.config = function(path) {
+            var jsonResource = resource.getResource(path);
+            if (jsonResource) {
+                return eval("("+jsonResource.getTextContentAsOneLine()+")");
+            }
+            return null;
+        }
+
         R.page = function(path) {
             return resource.page(path);
         }

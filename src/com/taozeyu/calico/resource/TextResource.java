@@ -23,4 +23,8 @@ public class TextResource extends AbstractResource<String> {
     public String getTextContent() throws IOException {
         return getContent();
     }
+
+    public String getTextContentAsOneLine() throws IOException {
+        return getContent().replaceAll("\\s+", " ");
+    }
 }
