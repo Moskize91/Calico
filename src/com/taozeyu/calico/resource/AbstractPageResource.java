@@ -1,5 +1,6 @@
 package com.taozeyu.calico.resource;
 
+import com.taozeyu.calico.util.PathUtil;
 import org.jsoup.Jsoup;
 
 import java.io.File;
@@ -34,7 +35,7 @@ public abstract class AbstractPageResource extends ResourceFileWithHead {
 	}
 
 	public String getName() {
-		return clearExtensionName(getFullName());
+		return PathUtil.clearExtensionName(getFullName());
 	}
 
 	public String getFullName() {
@@ -48,10 +49,6 @@ public abstract class AbstractPageResource extends ResourceFileWithHead {
 			sb.append((char) ch);
 		}
 		return sb.toString();
-	}
-
-	private String clearExtensionName(String path) {
-		return path.replaceAll("\\.(\\w|\\-)+$", "");
 	}
 
 	public String getAbstractContent() throws IOException {

@@ -1,58 +1,78 @@
 package com.taozeyu.calico;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.taozeyu.calico.copier.ResourceFileCopier;
 import com.taozeyu.calico.copier.TargetDirectoryCleaner;
 import com.taozeyu.calico.generator.Router;
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.web_services.WebService;
+
+import javax.script.ScriptException;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
 
-		File projectPath = getDirFromPath(getElementFromArgs(args, 0, "./"));
-		File targetPath = getDirFromPath(getElementFromArgs(args, 1, "./"));
-		String rootMapToPath = normalizePath(getElementFromArgs(args, 2, "/index.html"));
-		
-		File rootPath = new File(projectPath.getPath(), "template");
-		File resourcePath = new File(projectPath.getPath(), "resource");
+		checkArgs(args);
+
+		File targetPath = GlobalConfig.instance().getFile("target", "./");
+		File templatePath = GlobalConfig.instance().getFile("template", "./template");
+		File resourcePath = GlobalConfig.instance().getFile("resource", "./resource");
+		String rootMapToPath = GlobalConfig.instance().getString("root", "/index.html");
 		
 		ResourceManager resource = new ResourceManager(resourcePath);
-		Router router = new Router(resource, rootPath, rootMapToPath);
+		Router router = new Router(resource, templatePath, rootMapToPath);
+
+		String command = args[0];
+
+		if (command.toLowerCase().equals("build")) {
+			build(router, targetPath, templatePath);
+
+		} else if (command.toLowerCase().equals("service")) {
+			service(router);
+
+		} else {
+			throw new RuntimeException("Unknown command "+ command);
+		}
+	}
+
+	private static void build(Router router, File targetPath, File templatePath)
+			throws IOException, ScriptException {
 
 		new TargetDirectoryCleaner(targetPath).clean();
-		new ResourceFileCopier(rootPath, targetPath).copy();
+		new ResourceFileCopier(templatePath, targetPath).copy();
 		new ContentBuilder(router, targetPath).buildFromRootFile();
 	}
 
-	private static String getElementFromArgs(String[] args, int index, String defaultValue) {
-		if (index >= args.length) {
-			return defaultValue;
-		} else {
-			return args[index];
+	private static void service(Router router) throws IOException, InterruptedException {
+		final WebService webService = new WebService(router);
+		webService.start();
+		System.out.println( "\nRunning! Point your browser to http://127.0.0.1:"+ webService.getListeningPort() +"/ \n" );
+		waitForCtrlCHook(() -> {
+            webService.closeAllConnections();
+            System.out.println("Press Ctrl+C to shutdown service.");
+        });
+	}
+
+	private static void checkArgs(String[] args) {
+		if (args.length != 1) {
+			throw new RuntimeException("Need just only ONE argument!");
 		}
 	}
 
-	private static File getDirFromPath(String path) {
-		File file;
-		if(isAbsolutePath(path)) {
-			file = new File(path);
-		} else {
-			path = path.replaceAll("^\\./", "");
-			file = new File(System.getProperty("user.dir"), path);
+	private static void waitForCtrlCHook(Runnable whenShutdown) throws InterruptedException {
+		final Object waitForHookLock = new Object();
+		Thread hookThread = new Thread(() -> {
+            whenShutdown.run();
+            synchronized (waitForHookLock) {
+                waitForHookLock.notifyAll();
+            }
+        });
+		Runtime.getRuntime().addShutdownHook(hookThread);
+		synchronized (waitForHookLock) {
+			waitForHookLock.wait();
 		}
-		if(!file.exists() || !file.isDirectory()) {
-			throw new RuntimeException("directory not found " + file.getPath() +".");
-		}
-		return file;
-	}
-
-	private static boolean isAbsolutePath(String path) {
-		return path.matches("([a-zA-Z]+:)?(\\\\|/).*");
-	}
-
-	private static String normalizePath(String path) {
-		return path.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+/?)?$", "");
 	}
 }

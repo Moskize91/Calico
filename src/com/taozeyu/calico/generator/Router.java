@@ -1,10 +1,9 @@
 package com.taozeyu.calico.generator;
 
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.util.PathUtil;
 
 public class Router {
 
@@ -19,59 +18,64 @@ public class Router {
 		this.routeDir = routeDir;
 		this.rootMapToPath = rootMapToPath;
 	}
-	
+
+	public File getFile(String relativePath) {
+		return new File(routeDir.getPath(), relativePath);
+	}
+
 	public FileGenerator getFileGenerator(String absolutePath) {
 
-		String targetPath = normalizePath(absolutePath);
+		String targetPath = getNormalizeTargetPath(absolutePath);
+		PageService pageService = getPageServiceWithNormalizeTargetPath(targetPath);
+		if (pageService == null) {
+			throw new RouteException("No template file map to '"+ absolutePath +"'.");
+		}
+		return new FileGenerator(pageService, new File(targetPath));
+	}
+
+	public PageService getPageService(String absolutePath) {
+
+		String targetPath = getNormalizeTargetPath(absolutePath);
+		return getPageServiceWithNormalizeTargetPath(targetPath);
+	}
+
+	private String getNormalizeTargetPath(String absolutePath) {
+
+		String targetPath = PathUtil.normalizePath(absolutePath);
 
 		if(targetPath.equals(RootPath)) {
 			targetPath = rootMapToPath;
 		}
-		return useAbsoluteTemplateOrUseParams(targetPath);
+		return targetPath;
 	}
 
-	private FileGenerator useAbsoluteTemplateOrUseParams(String targetPath) {
-		File targetPathTemplateFile = new File(routeDir, targetPath);
+	private PageService getPageServiceWithNormalizeTargetPath(String absolutePath) {
+		File targetPathTemplateFile = new File(routeDir, absolutePath);
 		if(targetPathTemplateFile.exists()) {
 			String params = "";
-			return new FileGenerator(resource, new File(targetPath), targetPathTemplateFile, routeDir, params);
+			return new PageService(resource, targetPathTemplateFile, routeDir, params);
 			
 		} else {
-			String extensionName = getExtensionName(targetPath);
-			String pathCells[] = clearHeadTailSlash(targetPath).split("/");
-			return createFileGenerator(targetPath, pathCells, extensionName);
+			String extensionName = PathUtil.getExtensionName(absolutePath);
+			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
+			return createPageService(pathCells, extensionName);
 		}
-	}
-
-	private String getExtensionName(String path) {
-		String extensionName;
-		Matcher matcher = Pattern.compile("\\.(\\w|\\-)+$").matcher(path);
-		if(matcher.find()) {
-			extensionName = matcher.group().replaceAll("^\\.", "");
-		} else {
-			extensionName = "html";
-		}
-		return extensionName;
 	}
 
 	private String clearHeadTailSlash(String path) {
 		return path.replaceAll("^/", "").replaceAll("/$", "");
 	}
 
-	private String normalizePath(String absolutePath) {
-		return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+/?)?$", "");
-	}
-	
-	private FileGenerator createFileGenerator(String absolutePath, String[] pathCells, String extensionName) {
+	private PageService createPageService(String[] pathCells, String extensionName) {
 		
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
 		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
 		File templatePath = getTemplatePath(path, extensionName);
-		if (templatePath == null) {
-			throw new RouteException("No template file map to '"+ absolutePath +"'.");
+		if (templatePath != null) {
+			String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
+			return new PageService(resource, templatePath, routeDir, params);
 		}
-		String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
-		return new FileGenerator(resource, new File(absolutePath), templatePath, routeDir, params);
+		return null;
 	}
 
 	private String getTemplateDirPath(String[] pathCells, int endOfExistDirIndex) {
@@ -100,7 +104,7 @@ public class Router {
 	}
 
 	private boolean isFileExist(File path) {
-		return new File(routeDir.getPath(), path.getPath()).exists();
+		return getFile(path.getPath()).exists();
 	}
 
 	private String selectParamsFromPath(String pathCells[], int startIndex) {

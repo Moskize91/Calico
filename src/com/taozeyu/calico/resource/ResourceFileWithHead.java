@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.taozeyu.calico.GlobalConifg;
+import com.taozeyu.calico.GlobalConfig;
 
 public class ResourceFileWithHead {
 
@@ -87,7 +87,7 @@ public class ResourceFileWithHead {
 	private Reader createResourceFileReader() throws FileNotFoundException {
 		InputStream inputStream = new FileInputStream(resourceFile);
 		inputStream = new BufferedInputStream(inputStream, ReadAttributeBufferedSize);
-		return new InputStreamReader(inputStream, GlobalConifg.instance.getCharset());
+		return new InputStreamReader(inputStream, GlobalConfig.instance().getCharset());
 	}
 	
 	private void collectLineMessageIntoAttributes(Map<String, String> attributeMap, String line) {

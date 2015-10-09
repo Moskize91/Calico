@@ -13,6 +13,7 @@ import javax.script.ScriptException;
 
 import com.taozeyu.calico.generator.FileGenerator;
 import com.taozeyu.calico.generator.Router;
+import com.taozeyu.calico.util.PathUtil;
 
 class ContentBuilder {
 
@@ -54,10 +55,6 @@ class ContentBuilder {
 	private boolean isWithoutDomain(String linkPath) {
 		return !UrlWithDomain.matcher(linkPath).find();
 	}
-	
-	private boolean isAbsolutePath(String linkPath) {
-		return linkPath.startsWith("/");
-	}
 
 	private String clearTailFileName(String currentPagePath) {
 		return currentPagePath.replaceAll("(\\w|\\-)+(\\.(\\w|\\-)+)*/?$", "");
@@ -71,7 +68,7 @@ class ContentBuilder {
 	}
 
 	private String toAbsolutePath(String currentPagePath, String linkPath) {
-		if(!isAbsolutePath(linkPath)) {
+		if(!PathUtil.isAbsolutePath(linkPath)) {
 			String parentPath = clearTailFileName(currentPagePath);
 			return parentPath + linkPath;
 		}
