@@ -18,6 +18,7 @@ public class JavaScriptLoader {
             "resource_manager",
             "print_stream",
             "pages_constructor",
+            "array_util",
             "params_helper",
     };
 

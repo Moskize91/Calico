@@ -31,6 +31,9 @@ public class PageService {
         try (Reader reader = getTemplateReader()){
             setPrintStreamToEngin(engine, printStream);
             engine.eval(getFileContentFromReader(reader));
+        } catch (ScriptException e) {
+            System.err.println("Error"+e.getMessage()+"(from "+ templatePath.getPath()+")");
+            throw e;
         }
     }
 
