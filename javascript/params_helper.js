@@ -2,12 +2,21 @@ var ParamsHelper = {};
 
 (function(){
 
-    ParamsHelper.parse = function(params) {
+    ParamsHelper.parse = function(params, defaultAttribute) {
 
-        var rsObj = {};
+        if (defaultAttribute === undefined) {
+            defaultAttribute = "defaultAttribute";
+        }
 
-        var arrParams = params.replace(/(^\/|\/$)/g, "").split("/"),
-            paramCount = Math.floor(arrParams.length/2);
+        var rsObj = {},
+            arrParams = params.replace(/(^\/|\/$)/g, "").split("/"),
+
+        arrParams = arrParams.filter(function(ele) {return ele.trim() != ""});
+        if (arrParams.length % 2 != 0) {
+            arrParams.unshift(defaultAttribute);
+        }
+
+        var paramCount = arrParams.length/2;
 
         for (var i=0; i<paramCount; ++i) {
             var name = arrParams[2*i].trim(),

@@ -29,7 +29,7 @@ public class PageService {
     public void requestPage(Printer printStream) throws IOException, ScriptException {
         ScriptEngine engine = createScriptEngine();
         try (Reader reader = getTemplateReader()){
-            setPrintStreamToEngin(engine, printStream);
+            setPrintStreamToEngine(engine, printStream);
             engine.eval(getFileContentFromReader(reader));
         } catch (ScriptException e) {
             System.err.println("Error"+e.getMessage()+"(from "+ templatePath.getPath()+")");
@@ -37,10 +37,11 @@ public class PageService {
         }
     }
 
-    private ScriptEngine createScriptEngine() throws IOException {
+    private ScriptEngine createScriptEngine() throws IOException, ScriptException {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
         engine.put("__resource", resource);
         engine.put("params", params);
+        engine.eval("var session = {}");
         try {
             new JavaScriptLoader().loadSystemJavaScriptLib(engine);
         } catch (ScriptException e) {
@@ -50,7 +51,7 @@ public class PageService {
         return engine;
     }
 
-    private void setPrintStreamToEngin(ScriptEngine jse, Printer printStream) throws ScriptException {
+    private void setPrintStreamToEngine(ScriptEngine jse, Printer printStream) throws ScriptException {
         jse.put("__printStream", printStream);
         jse.eval("Output = __printStream;");
         jse.eval("__printStream = undefined;");
