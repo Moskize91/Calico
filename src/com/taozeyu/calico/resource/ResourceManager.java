@@ -3,6 +3,7 @@ package com.taozeyu.calico.resource;
 import com.taozeyu.calico.util.PathUtil;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -127,6 +128,7 @@ public class ResourceManager {
 				}
 			}
 		}
+		pagesList.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
 		return pagesList.toArray(new AbstractPageResource[pagesList.size()]);
 	}
 
@@ -137,6 +139,7 @@ public class ResourceManager {
 				pagesList.add(page);
 			}
 		}
+		pagesList.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
 		return pagesList.toArray(new AbstractPageResource[pagesList.size()]);
 	}
 }
