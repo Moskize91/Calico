@@ -1,5 +1,20 @@
 (function(){
 
+    function attribute(obj, name) {
+        var attr;
+        if (typeof(obj.get) == "function") {
+            attr = obj.get(name);
+            if (attr) {
+                return attr;
+            }
+        }
+        attr = obj.name;
+        if (attr) {
+            return attr;
+        }
+        return undefined;
+    }
+
     function anyComparatorToCallback(comparator) {
         if (comparator === undefined || comparator === null) {
             return comparator;
@@ -19,7 +34,7 @@
             comparator = function(ele0, ele1) {
                 for (var i=0; i<nameArray.length; ++i) {
                     var name = nameArray[i];
-                    var rs = compareValue(ele0[name], ele1[name], descArray[i]);
+                    var rs = compareValue(attribute(ele0, name), attribute(ele1, name), descArray[i]);
                     if (rs != 0) {
                         return rs;
                     }
@@ -60,7 +75,7 @@
     function mapConditionToCallback(conditionObj) {
         return function(ele) {
             for (var name in conditionObj) {
-                if (ele[name] != conditionObj[name]) {
+                if (attribute(ele, name) != conditionObj[name]) {
                     return false;
                 }
             }
