@@ -38,7 +38,7 @@ abstract class AbstractResource<CONTENT> extends ResourceFileWithHead {
     }
 
     public String getPath() {
-        return resourcePath;
+        return PathUtil.clearExtensionName(resourcePath);
     }
 
     public String getName() {

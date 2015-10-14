@@ -40,7 +40,7 @@ public class ResourceManager {
 	public AbstractResource page(String path) {
 		File pageFile = getPageFile(path);
 		if(pageFile == null) {
-			return null;
+			throw new ResourceException("page not found: "+ path);
 		}
 		String absolutePath = toAbsolutePath(path);
 		switch(PathUtil.getExtensionName(pageFile.getName())) {

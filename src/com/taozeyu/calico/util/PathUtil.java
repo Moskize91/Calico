@@ -1,6 +1,8 @@
 package com.taozeyu.calico.util;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,6 +10,10 @@ import java.util.regex.Pattern;
  * Created by taozeyu on 15/10/9.
  */
 public class PathUtil {
+
+    private static String[] PosibleExtensionNames = new String[] {
+            "html", "htm", "md", "json"
+    };
 
     public static boolean isAbsolutePath(String path) {
         return path.matches("([a-zA-Z]+:)?(\\\\|/).*");
@@ -41,6 +47,21 @@ public class PathUtil {
     }
 
     public static String clearExtensionName(String path) {
-        return path.replaceAll("\\.(\\w|\\-)+$", "");
+        Matcher matcher = Pattern.compile("").matcher(path);
+        if (matcher.find()) {
+            if (isPosibleExtensionName(matcher.group())) {
+                return matcher.replaceAll("");
+            }
+        }
+        return path;
+    }
+
+    private static boolean isPosibleExtensionName(String extensionName) {
+        for (String posibleExtension : PosibleExtensionNames) {
+            if (posibleExtension.equals(extensionName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
