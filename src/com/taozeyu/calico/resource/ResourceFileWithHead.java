@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.taozeyu.calico.GlobalConfig;
@@ -117,7 +118,15 @@ public class ResourceFileWithHead {
 	}
 
 	private String[] splitLineIntoKeyValueArray(String line) {
-		return line.split("\\s*\\:\\s*");
+		Matcher matcher = Pattern.compile("\\s*\\:\\s*").matcher(line);
+		if (!matcher.find()) {
+			return new String[] {line, ""};
+		} else {
+			return new String[] {
+					line.substring(0, matcher.start()).trim(),
+					line.substring(matcher.end()).trim(),
+			};
+		}
 	}
 
 }
