@@ -47,13 +47,13 @@ public class PathUtil {
     }
 
     public static String clearExtensionName(String path) {
-        Matcher matcher = Pattern.compile("").matcher(path);
-        if (matcher.find()) {
-            if (isPosibleExtensionName(matcher.group())) {
-                return matcher.replaceAll("");
-            }
+        String clearedPath = path;
+        Matcher matcher = Pattern.compile("\\.(\\w|_|\\-)+$").matcher(path);
+        if (matcher.find() &&
+            isPosibleExtensionName(matcher.group().replaceFirst("\\.", ""))) {
+            clearedPath = matcher.replaceAll("");
         }
-        return path;
+        return clearedPath;
     }
 
     private static boolean isPosibleExtensionName(String extensionName) {
