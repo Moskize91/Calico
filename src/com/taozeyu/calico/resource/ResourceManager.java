@@ -38,9 +38,17 @@ public class ResourceManager {
 	}
 
 	public AbstractResource page(String path) {
+		AbstractResource resource = getPageAndReturnNullIfNotExist(path);
+		if(resource == null) {
+			throw new ResourceException("page not found: "+ path);
+		}
+		return resource;
+	}
+
+	private AbstractResource getPageAndReturnNullIfNotExist(String path) {
 		File pageFile = getPageFile(path);
 		if(pageFile == null) {
-			throw new ResourceException("page not found: "+ path);
+			return null;
 		}
 		String absolutePath = toAbsolutePath(path);
 		switch(PathUtil.getExtensionName(pageFile.getName())) {
@@ -121,10 +129,12 @@ public class ResourceManager {
 		List<AbstractResource> pagesList = new LinkedList<AbstractResource>();
 		for(File file:sourceDir.listFiles()) {
 			if(!file.isDirectory()) {
-				AbstractResource page = page(file.getName());
+				AbstractResource page = getPageAndReturnNullIfNotExist(file.getName());
 				// if page's extend name can't recognize, it should ignore.
 				if (page != null) {
 					pagesList.add(page);
+				} else {
+					System.out.println("page not found "+ file);
 				}
 			}
 		}
