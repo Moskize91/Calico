@@ -51,6 +51,7 @@ public class ResourceManager {
 			return null;
 		}
 		String absolutePath = toAbsolutePath(path);
+		System.out.println(PathUtil.clearExtensionName("" + path + " : "+ absolutePath));
 		switch(PathUtil.getExtensionName(pageFile.getName())) {
 			case "md":
 				return new MarkdownPageResource(pageFile, absolutePath);
@@ -144,6 +145,9 @@ public class ResourceManager {
 
 	public AbstractResource[] allPages() {
 		List<AbstractResource> pagesList = new LinkedList<AbstractResource>();
+		for (AbstractResource page : this.pages()) {
+			pagesList.add(page);
+		}
 		for (ResourceManager resourceManager : dirs()) {
 			for (AbstractResource page : resourceManager.pages()) {
 				pagesList.add(page);
