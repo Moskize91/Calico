@@ -51,7 +51,6 @@ public class ResourceManager {
 			return null;
 		}
 		String absolutePath = toAbsolutePath(path);
-		System.out.println(PathUtil.clearExtensionName("" + path + " : "+ absolutePath));
 		switch(PathUtil.getExtensionName(pageFile.getName())) {
 			case "md":
 				return new MarkdownPageResource(pageFile, absolutePath);
@@ -76,6 +75,7 @@ public class ResourceManager {
 			);
 			resourcePath = resourcePath.replaceAll("(^/|/$)", "");
 			relativePath = relativePath.replaceAll("(^/|/$)", "");
+			
 			return "/"+ resourcePath + "/" + relativePath;
 		}
 	}
@@ -104,7 +104,7 @@ public class ResourceManager {
 			if(!dir.exists() && !dir.isDirectory()) {
 				throw new ResourceException("directory not found '"+ path +"'.");
 			}
-			return new ResourceManager(dir, this);
+			return new ResourceManager(dir, rootResourceManager);
 		}
 	}
 	
@@ -120,7 +120,7 @@ public class ResourceManager {
 		List<ResourceManager> dirsList = new LinkedList<ResourceManager>();
 		for(File file:sourceDir.listFiles()) {
 			if(file.isDirectory()) {
-				dirsList.add(new ResourceManager(file, this));
+				dirsList.add(new ResourceManager(file, rootResourceManager));
 			}
 		}
 		return dirsList.toArray(new ResourceManager[dirsList.size()]);
@@ -134,8 +134,6 @@ public class ResourceManager {
 				// if page's extend name can't recognize, it should ignore.
 				if (page != null) {
 					pagesList.add(page);
-				} else {
-					System.out.println("page not found "+ file);
 				}
 			}
 		}
