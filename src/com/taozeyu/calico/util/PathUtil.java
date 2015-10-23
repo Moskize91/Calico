@@ -1,8 +1,6 @@
 package com.taozeyu.calico.util;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +18,7 @@ public class PathUtil {
     }
 
     public static  String normalizePath(String absolutePath) {
-        return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|\\-)+/?)?$", "");
+        return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|_|\\-)+/?)?$", "");
     }
 
     public static File getFile(String path, String currentDirectoryPath) {
@@ -29,6 +27,10 @@ public class PathUtil {
         }
         path = path.replaceFirst("^\\.(/|\\\\)", "");
         return new File(currentDirectoryPath, path);
+    }
+
+    public static String removeLastPathComponent(String path) {
+        return path.replaceAll("/?(\\.|\\w|_|\\-)+/?$", "");
     }
 
     public static String getExtensionName(String path) {
@@ -50,15 +52,15 @@ public class PathUtil {
         String clearedPath = path;
         Matcher matcher = Pattern.compile("\\.(\\w|_|\\-)+$").matcher(path);
         if (matcher.find() &&
-            isPosibleExtensionName(matcher.group().replaceFirst("\\.", ""))) {
+            isPossibleExtensionName(matcher.group().replaceFirst("\\.", ""))) {
             clearedPath = matcher.replaceAll("");
         }
         return clearedPath;
     }
 
-    private static boolean isPosibleExtensionName(String extensionName) {
-        for (String posibleExtension : PosibleExtensionNames) {
-            if (posibleExtension.equals(extensionName)) {
+    private static boolean isPossibleExtensionName(String extensionName) {
+        for (String possibleExtension : PosibleExtensionNames) {
+            if (possibleExtension.equals(extensionName)) {
                 return true;
             }
         }

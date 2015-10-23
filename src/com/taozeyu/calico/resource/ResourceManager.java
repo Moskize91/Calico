@@ -3,7 +3,6 @@ package com.taozeyu.calico.resource;
 import com.taozeyu.calico.util.PathUtil;
 
 import java.io.File;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,14 +37,14 @@ public class ResourceManager {
 	}
 
 	public AbstractResource page(String path) {
-		AbstractResource resource = getPageAndReturnNullIfNotExist(path);
+		AbstractResource resource = pageIfExist(path);
 		if(resource == null) {
 			throw new ResourceException("page not found: "+ path);
 		}
 		return resource;
 	}
 
-	private AbstractResource getPageAndReturnNullIfNotExist(String path) {
+	public AbstractResource pageIfExist(String path) {
 		File pageFile = getPageFile(path);
 		if(pageFile == null) {
 			return null;
@@ -130,7 +129,7 @@ public class ResourceManager {
 		List<AbstractResource> pagesList = new LinkedList<AbstractResource>();
 		for(File file:sourceDir.listFiles()) {
 			if(!file.isDirectory()) {
-				AbstractResource page = getPageAndReturnNullIfNotExist(file.getName());
+				AbstractResource page = pageIfExist(file.getName());
 				// if page's extend name can't recognize, it should ignore.
 				if (page != null) {
 					pagesList.add(page);

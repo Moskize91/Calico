@@ -18,6 +18,10 @@ var R;
             return resource.page(path);
         }
 
+        R.pageIfExist = function(path) {
+            return resource.pageIfExist(path);
+        }
+
         R.dir = function(path) {
             return wrap(resource.dir(path));
         }
