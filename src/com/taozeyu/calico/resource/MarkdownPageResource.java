@@ -8,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.petebevin.markdown.MarkdownProcessor;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import com.taozeyu.calico.util.EscapeHelper;
 
 public class MarkdownPageResource extends AbstractPageResource {
