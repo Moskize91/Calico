@@ -8,10 +8,18 @@
                 return attr;
             }
         }
-        attr = obj.name;
+
+        attr = obj[name];
         if (attr) {
             return attr;
         }
+
+        var getter = "get"+ name.replace(/^\w/, function(w) {return w.toUpperCase();});
+
+        if (obj[getter]) {
+            return obj[getter]();
+        }
+
         return undefined;
     }
 
@@ -29,7 +37,7 @@
             for (var i=0; i<comparator.length; ++i) {
                 var ele = comparator[i].trim();
                 descArray[i] = ele.match(/\s+desc$/g) != null;
-                nameArray[i] = ele.replaceAll(/\s+desc$/g, "");
+                nameArray[i] = ele.match(/(\w|\-|_|\.)+/g)[0];
             }
             comparator = function(ele0, ele1) {
                 for (var i=0; i<nameArray.length; ++i) {
@@ -48,7 +56,7 @@
     var TypeCompareList = ["function", "object", "string", "number", "boolean", "null", "undefined"];
 
     function compareValue(value0, value1, desc) {
-        if (typeof (value0) == typeof(value1)) {
+        if (typeof (value0) != typeof(value1)) {
             value0 = TypeCompareList.indexOf(typeof(value0));
             value1 = TypeCompareList.indexOf(typeof(value1));
         }
