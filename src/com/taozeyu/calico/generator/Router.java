@@ -28,28 +28,28 @@ public class Router {
 
 	public FileGenerator getFileGenerator(String absolutePath) {
 
-		String targetPath = getNormalizeTargetPath(absolutePath);
+		String targetPath = PathUtil.normalizePath(absolutePath);
+		boolean isRootPage = false;
+
+		if(targetPath.equals(RootPath)) {
+			targetPath = rootMapToPath;
+			isRootPage = true;
+		}
 		PageService pageService = getPageServiceWithNormalizeTargetPath(targetPath);
 		if (pageService == null) {
 			throw new RouteException("No template file map to '"+ absolutePath +"'.");
 		}
-		return new FileGenerator(pageService, new File(targetPath));
+		return new FileGenerator(pageService, new File(targetPath), isRootPage);
 	}
 
 	public PageService getPageService(String absolutePath) {
-
-		String targetPath = getNormalizeTargetPath(absolutePath);
-		return getPageServiceWithNormalizeTargetPath(targetPath);
-	}
-
-	private String getNormalizeTargetPath(String absolutePath) {
 
 		String targetPath = PathUtil.normalizePath(absolutePath);
 
 		if(targetPath.equals(RootPath)) {
 			targetPath = rootMapToPath;
 		}
-		return targetPath;
+		return getPageServiceWithNormalizeTargetPath(targetPath);
 	}
 
 	private PageService getPageServiceWithNormalizeTargetPath(String absolutePath) {

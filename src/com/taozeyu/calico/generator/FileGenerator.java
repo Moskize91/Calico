@@ -17,10 +17,12 @@ public class FileGenerator {
 	private final PageService pageService;
 
 	private final File absolutePath;
+	private final boolean isRootPage;
 	
-	FileGenerator(PageService pageService, File absolutePath) {
+	FileGenerator(PageService pageService, File absolutePath, boolean isRootPage) {
 		this.pageService = pageService;
 		this.absolutePath = absolutePath;
+		this.isRootPage = isRootPage;
 	}
 
 	public List<String> generateAndGetPageLinkList(File targetDir) throws IOException, ScriptException {
@@ -51,7 +53,11 @@ public class FileGenerator {
 	}
 
 	private File getTargetFile(File targetDir) {
-		return new File(targetDir, absolutePath.getPath() + ".html");
+		if (isRootPage) {
+			return new File(targetDir, "index.html");
+		} else {
+			return new File(targetDir, absolutePath.getPath() + ".html");
+		}
 	}
 
 	private List<String> createPageLinkList(File targetDir) throws IOException {
