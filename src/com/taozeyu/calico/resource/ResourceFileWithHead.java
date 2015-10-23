@@ -129,4 +129,8 @@ public class ResourceFileWithHead {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getName() + ":" + resourceFile;
+	}
 }

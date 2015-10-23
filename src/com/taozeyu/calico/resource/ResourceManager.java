@@ -142,15 +142,22 @@ public class ResourceManager {
 
 	public AbstractResource[] allPages() {
 		List<AbstractResource> pagesList = new LinkedList<AbstractResource>();
+		collectAllPagesInto(pagesList);
+		pagesList.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
+		return pagesList.toArray(new AbstractPageResource[pagesList.size()]);
+	}
+
+	private void collectAllPagesInto(List<AbstractResource> pagesList) {
 		for (AbstractResource page : this.pages()) {
 			pagesList.add(page);
 		}
 		for (ResourceManager resourceManager : dirs()) {
-			for (AbstractResource page : resourceManager.pages()) {
-				pagesList.add(page);
-			}
+			resourceManager.collectAllPagesInto(pagesList);
 		}
-		pagesList.sort((o1, o2) -> o2.getName().compareTo(o1.getName()));
-		return pagesList.toArray(new AbstractPageResource[pagesList.size()]);
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getName()+":"+sourceDir;
 	}
 }
