@@ -3,8 +3,10 @@ package com.taozeyu.calico;
 import com.taozeyu.calico.util.PathUtil;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -90,6 +92,36 @@ public class GlobalConfig {
 
     public String getString(String name) {
         return configMap.get(name);
+    }
+
+    public String[] getStringArray(String name) {
+        return getStringArray(name, "");
+    }
+
+    public String[] getStringArray(String name, String defaultValue) {
+        LinkedList<String> list = new LinkedList<>();
+        for (String str : getString(name, defaultValue).split("\\s+")) {
+            str = str.trim();
+            if (!"".equals(str)) {
+                list.add(str);
+            }
+        }
+        return list.toArray(new String[list.size()]);
+    }
+
+    public Pattern getPattern(String name) {
+        String neverMatchRegx = "$^";
+        return getPattern(name, neverMatchRegx);
+    }
+
+    public Pattern getPattern(String name, String defaultValue) {
+        String[] strArr = getStringArray(name, defaultValue);
+        String str = String.join("|", strArr);
+        if (str.length() >= 2) {
+            return Pattern.compile("("+str+")");
+        } else {
+            return Pattern.compile(str);
+        }
     }
 
     public File getFile(String name) {

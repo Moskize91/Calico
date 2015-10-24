@@ -1,11 +1,16 @@
 package com.taozeyu.calico.copier;
 
+import com.taozeyu.calico.GlobalConfig;
+
 import java.io.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by taozeyu on 15/10/6.
  */
 public class ResourceFileCopier {
+
+    private final Pattern ignorePattern = GlobalConfig.instance().getPattern("ignore");
 
     private File templateDir;
     private File targetDir;
@@ -37,7 +42,9 @@ public class ResourceFileCopier {
 
     private boolean fileSouldBeCopied(File file) {
         // extension name is not html or htm.
-        return !isReservedFile(file) && !file.getName().matches(".*\\.html?$");
+        return !isReservedFile(file) &&
+               !file.getName().matches(".*\\.html?$") &&
+               !ignorePattern.matcher(file.getPath()).find();
     }
 
     private boolean isReservedFile(File file) {

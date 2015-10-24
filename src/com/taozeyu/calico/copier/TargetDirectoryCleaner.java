@@ -1,6 +1,9 @@
 package com.taozeyu.calico.copier;
 
+import com.taozeyu.calico.GlobalConfig;
+
 import java.io.File;
+import java.util.regex.Pattern;
 
 /**
  * Created by taozeyu on 15/10/6.
@@ -10,6 +13,7 @@ public class TargetDirectoryCleaner {
     private static String[] ArtResourceExtendionNames = new String[] {
             "jpge", "jpg", "png", "gif"
     };
+    private final Pattern ignorePattern = GlobalConfig.instance().getPattern("ignore");
     private File targetPath;
 
     public TargetDirectoryCleaner(File targetPath) {
@@ -36,7 +40,9 @@ public class TargetDirectoryCleaner {
     }
 
     private boolean fileShouldBeCleaned(File file) {
-        return !isReservedFile(file) && !isArtResourceFile(file);
+        return !isReservedFile(file) &&
+               !isArtResourceFile(file) &&
+               !ignorePattern.matcher(file.getPath()).find();
     }
 
     private boolean isReservedFile(File file) {
