@@ -41,6 +41,7 @@ public class PageService {
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
         engine.put("__resource", resource);
         engine.put("params", params);
+        engine.put("template", getTemplatePathOfProject());
         engine.eval("var session = {}");
         try {
             new JavaScriptLoader().loadSystemJavaScriptLib(engine);
@@ -77,5 +78,9 @@ public class PageService {
         } else {
             return new HtmlTemplateReader(templateReader);
         }
+    }
+
+    private String getTemplatePathOfProject() {
+        return templatePath.getPath().substring(routeDir.getPath().length());
     }
 }
