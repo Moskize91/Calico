@@ -13,7 +13,8 @@ public class TargetDirectoryCleaner {
     private static String[] ArtResourceExtendionNames = new String[] {
             "jpge", "jpg", "png", "gif"
     };
-    private final Pattern ignorePattern = GlobalConfig.instance().getPattern("ignore");
+    private final Pattern ignoreCopyPattern = GlobalConfig.instance().getPattern("ignore-copy");
+    private final Pattern ignoreCleanPattern = GlobalConfig.instance().getPattern("ignore-clean", ".*\\.git.*");
     private File targetPath;
 
     public TargetDirectoryCleaner(File targetPath) {
@@ -42,7 +43,8 @@ public class TargetDirectoryCleaner {
     private boolean fileShouldBeCleaned(File file) {
         return !isReservedFile(file) &&
                !isArtResourceFile(file) &&
-               !ignorePattern.matcher(file.getPath()).find();
+               !ignoreCopyPattern.matcher(file.getPath()).find() &&
+               !ignoreCleanPattern.matcher(file.getPath()).find();
     }
 
     private boolean isReservedFile(File file) {

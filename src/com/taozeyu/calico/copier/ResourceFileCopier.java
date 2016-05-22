@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public class ResourceFileCopier {
 
-    private final Pattern ignorePattern = GlobalConfig.instance().getPattern("ignore");
+    private final Pattern ignorePattern = GlobalConfig.instance().getPattern("ignore-copy");
 
     private File templateDir;
     private File targetDir;
