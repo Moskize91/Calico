@@ -1,5 +1,6 @@
 Calico
 ======
+![master branch](https://travis-ci.org/Moskize91/Calico.svg?branch=master)
 
 这个程序将用于生成静态 HTML 页面。目前想用其生成一个博客这种程度的页面。博客中的文章（Resource）可以用 Markdown 写，也可以直接写成 HTML。这些文章将由模板（Template）读出，并生成最终的 HTML 页面。
 
