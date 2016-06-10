@@ -1,10 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 CALICO_JAR_FILE_NAME="Calico-debug.jar"
 
 #check build builded?
-if [[ ! -f "$PWD/release/$CALICO_JAR_FILE_NAME" ]];
-then
+if [[ ! -f "$PWD/release/$CALICO_JAR_FILE_NAME" ]]; then
     echo "calico has bean not build, please run 'ant build' first."
     exit 1
 fi
@@ -12,7 +11,7 @@ fi
 #check installed java1.8
 if type -p java; then
     _java=java
-elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
+elif [[ -n "$JAVA_HOME" ]]&&[[ -x "$JAVA_HOME/bin/java" ]]; then
     _java="$JAVA_HOME/bin/java"
 else
     echo "calico need Java (version >= 1.8). you have to install Java first."
