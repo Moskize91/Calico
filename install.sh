@@ -30,7 +30,8 @@ fi
 echo "Installing calico..."
 rm -rf $PWD/release/bin
 mkdir $PWD/release/bin
-echo "#!/bin/sh\njava -jar $PWD/release/$CALICO_JAR_FILE_NAME \$1" > $PWD/release/bin/calico
+echo "#!/bin/sh" > $PWD/release/bin/calico
+echo "java -jar $PWD/release/$CALICO_JAR_FILE_NAME \$1" >> $PWD/release/bin/calico
 chmod a+x $PWD/release/bin/calico
 
 echo "Try to link calico. (Need Permission)"
