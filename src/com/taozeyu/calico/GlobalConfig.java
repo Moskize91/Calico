@@ -1,5 +1,6 @@
 package com.taozeyu.calico;
 
+import com.taozeyu.calico.util.GitHelper;
 import com.taozeyu.calico.util.PathUtil;
 
 import java.io.*;
@@ -129,7 +130,12 @@ public class GlobalConfig {
     }
 
     public File getFile(String name, String defaultValue) {
-        return PathUtil.getFile(getString(name, defaultValue), configFileDir().getPath());
+        String value = getString(name, defaultValue);
+        if (GitHelper.instance.isGitURL(value)) {
+            return GitHelper.instance.getLocalDirectoryOfGitURL(value);
+        } else {
+            return PathUtil.getFile(value, configFileDir().getPath());
+        }
     }
 
     public int getInt(String name) {
