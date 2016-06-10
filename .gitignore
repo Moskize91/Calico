@@ -2,8 +2,11 @@
 
 /project/
 /generate/
+/release/
+!/release/install.sh
+
 .idea
 Calico.iml
 out
 *.swp
-release
+
