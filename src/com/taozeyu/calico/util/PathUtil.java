@@ -17,8 +17,12 @@ public class PathUtil {
         return path.matches("([a-zA-Z]+:)?(\\\\|/).*");
     }
 
-    public static  String normalizePath(String absolutePath) {
-        return absolutePath.replaceAll("\\\\", "/").replaceAll("(\\.(\\w|_|\\-)+/?)?$", "");
+    public static String normalizePath(String absolutePath) {
+        return absolutePath.replaceAll("\\\\", "/");
+    }
+
+    public static  String normalizePathAndCleanExtensionName(String absolutePath) {
+        return normalizePath(absolutePath).replaceAll("(\\.(\\w|_|\\-)+/?)?$", "");
     }
 
     public static File getFile(String path, String currentDirectoryPath) {

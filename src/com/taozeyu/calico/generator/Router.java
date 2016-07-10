@@ -28,7 +28,7 @@ public class Router {
 
 	public FileGenerator getFileGenerator(String absolutePath) {
 
-		String targetPath = PathUtil.normalizePath(absolutePath);
+		String targetPath = PathUtil.normalizePathAndCleanExtensionName(absolutePath);
 		boolean isRootPage = false;
 
 		if(targetPath.equals(RootPath)) {
@@ -44,7 +44,7 @@ public class Router {
 
 	public PageService getPageService(String absolutePath) {
 
-		String targetPath = PathUtil.normalizePath(absolutePath);
+		String targetPath = PathUtil.normalizePathAndCleanExtensionName(absolutePath);
 
 		if(targetPath.equals(RootPath)) {
 			targetPath = rootMapToPath;
