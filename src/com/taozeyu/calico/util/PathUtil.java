@@ -9,16 +9,34 @@ import java.util.regex.Pattern;
  */
 public class PathUtil {
 
-    private static String[] PosibleExtensionNames = new String[] {
-            "html", "htm", "md", "json"
-    };
-
     public static boolean isAbsolutePath(String path) {
         return path.matches("([a-zA-Z]+:)?(\\\\|/).*");
     }
 
     public static String normalizePath(String absolutePath) {
         return absolutePath.replaceAll("\\\\", "/");
+    }
+
+    public static String toUnixLikeStylePath(String path) {
+        if (isAbsolutePath(path)) {
+            path = path.replaceAll("^[a-zA-Z]+:]", "");
+        }
+        return normalizePath(path);
+    }
+
+    public static String[] splitComponents(String path) {
+        return path.replaceAll("(^(/|\\\\)|(/|\\\\)$)", "").split("(/|\\\\)");
+    }
+
+    public static String pathFromComponents(String[] components, boolean isRoot) {
+        String path = isRoot? "/": "";
+        for (int i = 0; i < components.length; i ++) {
+            path += components[i];
+            if (i < components.length - 1) {
+                path += "/";
+            }
+        }
+        return path;
     }
 
     public static  String normalizePathAndCleanExtensionName(String absolutePath) {
@@ -55,19 +73,9 @@ public class PathUtil {
     public static String clearExtensionName(String path) {
         String clearedPath = path;
         Matcher matcher = Pattern.compile("\\.(\\w|_|\\-)+$").matcher(path);
-        if (matcher.find() &&
-            isPossibleExtensionName(matcher.group().replaceFirst("\\.", ""))) {
+        if (matcher.find()) {
             clearedPath = matcher.replaceAll("");
         }
         return clearedPath;
-    }
-
-    private static boolean isPossibleExtensionName(String extensionName) {
-        for (String possibleExtension : PosibleExtensionNames) {
-            if (possibleExtension.equals(extensionName)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
