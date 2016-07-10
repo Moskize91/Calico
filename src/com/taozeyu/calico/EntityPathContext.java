@@ -69,12 +69,7 @@ public class EntityPathContext {
     }
 
     private String fileName(String path) {
-        String fileName = path.substring(beginIndexOfFileNameWithPath(path));
-        String extensionName = PathUtil.getExtensionName(path, null);
-        if (!"js".equals(extensionName.toLowerCase())) {
-            fileName += ".js";
-        }
-        return fileName;
+        return path.substring(beginIndexOfFileNameWithPath(path));
     }
 
     private int beginIndexOfFileNameWithPath(String path) {
