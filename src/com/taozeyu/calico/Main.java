@@ -2,11 +2,13 @@ package com.taozeyu.calico;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.taozeyu.calico.copier.ResourceFileCopier;
 import com.taozeyu.calico.copier.TargetDirectoryCleaner;
 import com.taozeyu.calico.generator.Router;
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.util.PathUtil;
 import com.taozeyu.calico.web_services.WebService;
 
 import javax.script.ScriptException;
@@ -14,7 +16,6 @@ import javax.script.ScriptException;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-
 		checkArgs(args);
 
 		File targetPath = GlobalConfig.instance().getFile("target", "./");
@@ -37,6 +38,23 @@ public class Main {
 			throw new RuntimeException("Unknown command "+ command);
 		}
 	}
+
+    private String getHomePath() {
+        String path = Main.class.getResource("Main.class").toString();
+        path = PathUtil.toUnixLikeStylePath(path);
+        int index = path.lastIndexOf("!/com/taozeyu/calico/Main.class");
+        if (index > 0) {
+            path = path.substring(0, index);
+            String[] components = PathUtil.splitComponents(path);
+            components = Arrays.copyOfRange(components, 0, components.length - 2);
+            boolean isRoot = true;
+            path = PathUtil.pathFromComponents(components, isRoot);
+        } else {
+            index = path.lastIndexOf("out/production/Calico/com/taozeyu/calico/Main.class");
+            path = path.substring(0, index);
+        }
+        return path;
+    }
 
 	private static void build(Router router, File targetPath, File templatePath)
 			throws IOException, ScriptException {
