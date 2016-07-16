@@ -34,12 +34,11 @@ public class Main {
 		File targetPath = GlobalConfig.instance().getFile("target", "./");
 		File templatePath = GlobalConfig.instance().getFile("template", "./template");
 		File resourcePath = GlobalConfig.instance().getFile("resource", "./resource");
-		String rootMapToPath = GlobalConfig.instance().getString("root", "/index.html");
-		
+
 		ResourceManager resource = new ResourceManager(resourcePath);
 		Router router = new Router(runtimeContext, resource);
 
-		String command = args[0];
+		String command = argumentsHandler.getCommand();
 
 		if (command.toLowerCase().equals("build")) {
 			build(router, targetPath, templatePath);
@@ -79,11 +78,14 @@ public class Main {
                 .eval("__calico_configuration.value_of_string('template_directory')");
         String targetDirectory = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('target_directory')");
+        String resourceDirectory = (String) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_string('resource_directory')");
         String rootPage = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('root_page')");
 
         runtimeContext.setTemplateDirectory(getDirectoryWithPath(templateDirectory));
         runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
+        runtimeContext.setResourceDirecotry(getDirectoryWithPath(resourceDirectory));
         runtimeContext.setRootPage(rootPage);
 
         return runtimeContext;

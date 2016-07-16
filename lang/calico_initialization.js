@@ -3,7 +3,8 @@
 L.Configuration = function() {
     this.configure = {
         template_directory : "./template",
-        target_directory : "./",
+        target_directory : "./target",
+        resource_directory : "./",
         root_page : "/index.html",
     };
 };

@@ -10,6 +10,7 @@ public class RuntimeContext {
 
     private File templateDirectory;
     private File targetDirectory;
+    private File resourceDirecotry;
     private File systemEntityDirectory;
     private String rootPage;
     private Map<String, File> librerayDirectoryMap;
@@ -30,12 +31,12 @@ public class RuntimeContext {
         this.targetDirectory = targetDirectory;
     }
 
-    public String getRootPage() {
-        return rootPage;
+    public File getResourceDirecotry() {
+        return resourceDirecotry;
     }
 
-    public void setRootPage(String rootPage) {
-        this.rootPage = rootPage;
+    public void setResourceDirecotry(File resourceDirecotry) {
+        this.resourceDirecotry = resourceDirecotry;
     }
 
     public File getSystemEntityDirectory() {
@@ -44,6 +45,14 @@ public class RuntimeContext {
 
     public void setSystemEntityDirectory(File systemEntityDirectory) {
         this.systemEntityDirectory = systemEntityDirectory;
+    }
+
+    public String getRootPage() {
+        return rootPage;
+    }
+
+    public void setRootPage(String rootPage) {
+        this.rootPage = rootPage;
     }
 
     public Map<String, File> getLibrerayDirectoryMap() {
