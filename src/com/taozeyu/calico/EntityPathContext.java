@@ -58,6 +58,18 @@ public class EntityPathContext {
         }
     }
 
+    public File entityFile(String path) {
+        ContextResult contextResult = findFileAndParentContext(path);
+        EntityPathContext context = contextResult.getContext();
+        String fileName = contextResult.getFileName();
+        if (context.entityModule == EntityModule.SystemLibrary &&
+                context.moduleDirectory == null) {
+            return null;
+        } else {
+            return new File(context.moduleDirectory, fileName);
+        }
+    }
+
     public InputStream inputStreamOfFile(String path) {
         ContextResult contextResult = findFileAndParentContext(path);
         EntityPathContext context = contextResult.getContext();
@@ -210,7 +222,9 @@ public class EntityPathContext {
 
     public enum EntityType {
 
-        JavaScript("javascript", new String[]{"js"});
+        JavaScript("javascript", new String[]{"js"}),
+        Asset("asset", new String[] {}),
+        Page("view", new String[] {});
 
         private final Set<String> extensionNameSet = new HashSet<>();
         private final String extensionName;

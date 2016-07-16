@@ -31,22 +31,13 @@ public class Main {
         }
         RuntimeContext runtimeContext = configureRuntimeContext();
 
-        if (true) {
-            return;
-        }
-
-
-		checkArgs(args);
-
-
-
 		File targetPath = GlobalConfig.instance().getFile("target", "./");
 		File templatePath = GlobalConfig.instance().getFile("template", "./template");
 		File resourcePath = GlobalConfig.instance().getFile("resource", "./resource");
 		String rootMapToPath = GlobalConfig.instance().getString("root", "/index.html");
 		
 		ResourceManager resource = new ResourceManager(resourcePath);
-		Router router = new Router(resource, templatePath, rootMapToPath);
+		Router router = new Router(runtimeContext, resource);
 
 		String command = args[0];
 

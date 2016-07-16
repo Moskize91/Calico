@@ -1,7 +1,10 @@
 package com.taozeyu.calico.generator;
 
 import java.io.File;
+import java.io.InputStream;
 
+import com.taozeyu.calico.EntityPathContext;
+import com.taozeyu.calico.RuntimeContext;
 import com.taozeyu.calico.resource.ResourceManager;
 import com.taozeyu.calico.util.PathUtil;
 
@@ -12,18 +15,36 @@ public class Router {
 			"html", "htm",
 	};
 
+	private final RuntimeContext runtimeContext;
+	private final EntityPathContext assetEntity;
+	private final EntityPathContext pageEntity;
 	private final ResourceManager resource;
 	private final File routeDir;
-	private final String rootMapToPath;
 	
-	public Router(ResourceManager resource, File routeDir, String rootMapToPath) {
+	public Router(RuntimeContext runtimeContext, ResourceManager resource) {
+		this.runtimeContext = runtimeContext;
 		this.resource = resource;
-		this.routeDir = routeDir;
-		this.rootMapToPath = rootMapToPath;
+		this.assetEntity = new EntityPathContext(
+				runtimeContext,
+				EntityPathContext.EntityType.Asset,
+				EntityPathContext.EntityModule.Template,
+				runtimeContext.getTemplateDirectory(), "/"
+		);
+		this.pageEntity = new EntityPathContext(
+				runtimeContext,
+				EntityPathContext.EntityType.Page,
+				EntityPathContext.EntityModule.Template,
+				runtimeContext.getTemplateDirectory(), "/"
+		);
+		this.routeDir = runtimeContext.getTemplateDirectory();
 	}
 
-	public File getFile(String relativePath) {
-		return new File(routeDir.getPath(), relativePath);
+	public boolean existAsset(String relativePath) {
+		return assetEntity.entityExist(relativePath);
+	}
+
+	public InputStream getAsset(String relativePath) {
+		return assetEntity.inputStreamOfFile(relativePath);
 	}
 
 	public FileGenerator getFileGenerator(String absolutePath) {
@@ -32,7 +53,7 @@ public class Router {
 		boolean isRootPage = false;
 
 		if(targetPath.equals(RootPath)) {
-			targetPath = rootMapToPath;
+			targetPath = runtimeContext.getRootPage();
 			isRootPage = true;
 		}
 		PageService pageService = getPageServiceWithNormalizeTargetPath(targetPath);
@@ -47,17 +68,15 @@ public class Router {
 		String targetPath = PathUtil.normalizePathAndCleanExtensionName(absolutePath);
 
 		if(targetPath.equals(RootPath)) {
-			targetPath = rootMapToPath;
+			targetPath = runtimeContext.getRootPage();
 		}
 		return getPageServiceWithNormalizeTargetPath(targetPath);
 	}
 
 	private PageService getPageServiceWithNormalizeTargetPath(String absolutePath) {
-		File targetPathTemplateFile = new File(routeDir, absolutePath);
-		if(targetPathTemplateFile.exists()) {
-			String params = "";
+		if (pageEntity.entityExist(absolutePath)) {
+			File targetPathTemplateFile = pageEntity.entityFile(absolutePath);String params = "";
 			return new PageService(resource, targetPathTemplateFile, routeDir, params);
-			
 		} else {
 			String extensionName = PathUtil.getExtensionName(absolutePath);
 			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
@@ -98,16 +117,12 @@ public class Router {
 		for(int i=0; i<pathCells.length; ++i) {
 			String pathCell = pathCells[i] + "." + extensionName;
 			path = new File(path, pathCell);
-			if(!isFileExist(path)) {
+			if(pageEntity.entityExist(path.getPath())) {
 				break;
 			}
 			endOfExistDirIndex = i;
 		}
 		return endOfExistDirIndex;
-	}
-
-	private boolean isFileExist(File path) {
-		return getFile(path.getPath()).exists();
 	}
 
 	private String selectParamsFromPath(String pathCells[], int startIndex) {

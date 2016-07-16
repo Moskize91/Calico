@@ -100,12 +100,11 @@ public class WebService extends NanoHTTPD {
     }
 
     private Response generateResourceResponse(String path) throws FileNotFoundException {
-        File resourceFile = router.getFile(path);
-        if (!isFile(resourceFile)) {
+        if (!router.existAsset(path)) {
             return getErrorMessageResponse(NOT_FOUND, "404 Resource Not Found:"+ path);
         }
         String contentType = getContentTypeByExtensionName(PathUtil.getExtensionName(path));
-        InputStream is = new BufferedInputStream(new FileInputStream(resourceFile), 1024);
+        InputStream is = new BufferedInputStream(router.getAsset(path), 1024);
         return new Response(OK, contentType, is);
     }
 
