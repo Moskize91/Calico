@@ -222,35 +222,17 @@ public class EntityPathContext {
 
     public enum EntityType {
 
-        JavaScript("javascript", new String[]{"js"}),
-        Asset("asset", new String[] {}),
-        Page("view", new String[] {});
+        JavaScript("javascript"),
+        Asset("asset"),
+        Page("view");
 
-        private final Set<String> extensionNameSet = new HashSet<>();
-        private final String extensionName;
         private final String directoryName;
 
-        EntityType(String directoryName, String[] extensionNames) {
-            for (String extensionName : extensionNames) {
-                this.extensionNameSet.add(extensionName.toLowerCase());
-            }
+        EntityType(String directoryName) {
             this.directoryName = directoryName;
-            this.extensionName = extensionNames[0];
         }
-
-        public String getExtensionName() {
-            return extensionName;
-        }
-
         public String getDirectoryName() {
             return directoryName;
-        }
-
-        public boolean matchExtensionName(String extensionName) {
-            if (extensionName == null) {
-                return false;
-            }
-            return extensionNameSet.contains(extensionName.toLowerCase());
         }
     }
 }
