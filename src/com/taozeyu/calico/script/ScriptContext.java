@@ -83,7 +83,7 @@ public class ScriptContext {
     }
 
     public Object loadScriptFile(InputStream inputStream) throws ScriptException {
-        String head = "var __require_module = {}" +
+        String head = "var __require_module = {};\n" +
                       "(function(require, M) {\n";
         String footer = "\n}) (__require, __require_module);\n" +
                         "__require_module;";
@@ -147,7 +147,7 @@ public class ScriptContext {
             }
             int lenNeedRead = Math.min(footer.length() - footerStartIndex, len);
             for (int i = 0; i < lenNeedRead; i++) {
-                cbuf[off + i] = head.charAt(footerStartIndex + i);
+                cbuf[off + i] = footer.charAt(footerStartIndex + i);
             }
             index += lenNeedRead;
             readCount += lenNeedRead;

@@ -64,7 +64,7 @@ public class Main {
         initScriptContext.engine().put("__calico_initialization", calicoInitialization);
 
         String head = "var __calico_configuration = new __calico_initialization.Configuration();" +
-                      "(function(configure) {" +
+                      "(function(configure) {\n" +
                       "var __calico_configuration = undefined;\n"; //mask variables
         String footer = "}) (__calico_configuration.configure);\n";
 

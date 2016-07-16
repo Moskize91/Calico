@@ -1,6 +1,6 @@
 // calico system library
 
-L.Configuration = function() {
+M.Configuration = function() {
     this.configure = {
         template_directory : "./template",
         target_directory : "./target",
@@ -9,7 +9,7 @@ L.Configuration = function() {
     };
 };
 
-L.Configuration.prototype.value_of_string = function(name) {
+M.Configuration.prototype.value_of_string = function(name) {
     if (!this.configure[name]) {
         return null;
     }
