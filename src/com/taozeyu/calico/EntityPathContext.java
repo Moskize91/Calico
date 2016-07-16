@@ -3,10 +3,7 @@ package com.taozeyu.calico;
 import com.taozeyu.calico.exception.EntityPathContextException;
 import com.taozeyu.calico.util.PathUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -20,9 +17,9 @@ public class EntityPathContext {
     private final File moduleDirectory;
     private final String absolutionPath;
 
-    private EntityPathContext(RuntimeContext runtimeContext,
-                              EntityType entityType, EntityModule entityModule,
-                              File moduleDirectory, String absolutionPath) {
+    public EntityPathContext(RuntimeContext runtimeContext,
+                             EntityType entityType, EntityModule entityModule,
+                             File moduleDirectory, String absolutionPath) {
         this.runtimeContext = runtimeContext;
         this.entityType = entityType;
         this.entityModule = entityModule;
@@ -47,9 +44,12 @@ public class EntityPathContext {
     public InputStream inputStreamOfFile(String path) {
         EntityPathContext context = contextOfFile(path);
         String fileName = fileName(path);
+
         if (context.entityModule == EntityModule.SystemLibrary &&
             context.moduleDirectory == null) {
-            path = "/lang"+ context.absolutionPath + "/" + fileName;
+            String parentPath = context.absolutionPath;
+            parentPath = parentPath.replaceAll("/$", "");
+            path = "/lang"+ parentPath + "/" + fileName;
             ClassLoader loader = getClass().getClassLoader();
             return loader.getResourceAsStream(path);
         } else {
@@ -60,6 +60,10 @@ public class EntityPathContext {
                 return null;
             }
         }
+    }
+
+    public Reader readerOfFile(String path) {
+        return new InputStreamReader(inputStreamOfFile(path));
     }
 
     public EntityPathContext contextOfFile(String path) {

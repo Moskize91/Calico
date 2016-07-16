@@ -8,6 +8,7 @@ import com.taozeyu.calico.copier.ResourceFileCopier;
 import com.taozeyu.calico.copier.TargetDirectoryCleaner;
 import com.taozeyu.calico.generator.Router;
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.script.ScriptContext;
 import com.taozeyu.calico.util.PathUtil;
 import com.taozeyu.calico.web_services.WebService;
 
@@ -15,8 +16,41 @@ import javax.script.ScriptException;
 
 public class Main {
 
+    private static final String CurrentVersion = "1.0.0";
+
 	public static void main(String[] args) throws Exception {
+        ArgumentsHandler argumentsHandler = new ArgumentsHandler(args) {{
+            abbreviation("v", "version");
+        }};
+        if (argumentsHandler.getCommand() == null) {
+            if (argumentsHandler.hasValue("version")) {
+                System.out.println(CurrentVersion);
+                System.exit(0);
+            }
+        }
+        RuntimeContext runtimeContext = new RuntimeContext();
+        runtimeContext.setSystemEntityDirectory(new File(getHomePath()));
+
+        File moduleDirectory = runtimeContext.getSystemEntityDirectory();
+        EntityPathContext entityPathContext = new EntityPathContext(
+                runtimeContext,
+                EntityPathContext.EntityType.JavaScript,
+                EntityPathContext.EntityModule.SystemLibrary,
+                new File(moduleDirectory, "lang"), "/");
+        ScriptContext initScriptContext = new ScriptContext(
+                entityPathContext,
+                runtimeContext);
+        System.out.println(initScriptContext.engine().eval("__script_context.require(1)(2, 5)"));
+
+
+        if (true) {
+            return;
+        }
+
+
 		checkArgs(args);
+
+
 
 		File targetPath = GlobalConfig.instance().getFile("target", "./");
 		File templatePath = GlobalConfig.instance().getFile("template", "./template");
@@ -39,7 +73,7 @@ public class Main {
 		}
 	}
 
-    private String getHomePath() {
+    private static String getHomePath() {
         String path = Main.class.getResource("Main.class").toString();
         path = PathUtil.toUnixLikeStylePath(path);
         int index = path.lastIndexOf("!/com/taozeyu/calico/Main.class");
@@ -52,6 +86,7 @@ public class Main {
         } else {
             index = path.lastIndexOf("out/production/Calico/com/taozeyu/calico/Main.class");
             path = path.substring(0, index);
+            path = path.replaceAll("^file:", "");
         }
         return path;
     }
