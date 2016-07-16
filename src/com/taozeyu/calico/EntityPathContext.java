@@ -28,8 +28,9 @@ public class EntityPathContext {
     }
 
     public boolean entityExist(String path) {
-        EntityPathContext context = contextOfFile(path);
-        String fileName = fileName(path);
+        ContextResult contextResult = findFileAndParentContext(path);
+        EntityPathContext context = contextResult.getContext();
+        String fileName = contextResult.getFileName();
         if (context.entityModule == EntityModule.SystemLibrary &&
                 context.moduleDirectory == null) {
             path = "/lang"+ context.absolutionPath + "/" + fileName;
@@ -42,8 +43,9 @@ public class EntityPathContext {
     }
 
     public InputStream inputStreamOfFile(String path) {
-        EntityPathContext context = contextOfFile(path);
-        String fileName = fileName(path);
+        ContextResult contextResult = findFileAndParentContext(path);
+        EntityPathContext context = contextResult.getContext();
+        String fileName = contextResult.getFileName();
 
         if (context.entityModule == EntityModule.SystemLibrary &&
             context.moduleDirectory == null) {
@@ -62,18 +64,11 @@ public class EntityPathContext {
         }
     }
 
-    public Reader readerOfFile(String path) {
-        return new InputStreamReader(inputStreamOfFile(path));
-    }
-
-    public EntityPathContext contextOfFile(String path) {
+    public ContextResult findFileAndParentContext(String path) {
         int beginIndexOfFileName = beginIndexOfFileNameWithPath(path);
         String contextPath = path.substring(0, beginIndexOfFileName);
-        return this.context(contextPath);
-    }
-
-    private String fileName(String path) {
-        return path.substring(beginIndexOfFileNameWithPath(path));
+        String fileName = contextPath.substring(beginIndexOfFileName);
+        return new ContextResult(findContext(contextPath), fileName);
     }
 
     private int beginIndexOfFileNameWithPath(String path) {
@@ -81,7 +76,7 @@ public class EntityPathContext {
         return Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\')) + 1;
     }
 
-    public EntityPathContext context(String path) {
+    public EntityPathContext findContext(String path) {
         String absolutePath = getPathByThisContext(path);
         if (absolutePath.equals(this.absolutionPath)) {
             return this;
@@ -156,6 +151,25 @@ public class EntityPathContext {
             File directory = new File(moduleDirectory.getAbsolutePath(),
                                       entityType.getDirectoryName() + absolutionPath);
             return directory.exists() && directory.isDirectory();
+        }
+    }
+
+    public static class ContextResult {
+
+        private final EntityPathContext context;
+        private final String fileName;
+
+        private ContextResult(EntityPathContext context, String fileName) {
+            this.context = context;
+            this.fileName = fileName;
+        }
+
+        public EntityPathContext getContext() {
+            return context;
+        }
+
+        public String getFileName() {
+            return fileName;
         }
     }
 
