@@ -27,6 +27,22 @@ public class EntityPathContext {
         this.absolutionPath = absolutionPath;
     }
 
+    @Override
+    public int hashCode() {
+        return absolutionPath.hashCode() + entityModule.hashCode() + entityType.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EntityPathContext) {
+            EntityPathContext other = (EntityPathContext) obj;
+            return this.entityType == other.entityType &&
+                   this.entityModule == other.entityModule &&
+                   this.absolutionPath.equals(other.absolutionPath);
+        }
+        return false;
+    }
+
     public boolean entityExist(String path) {
         ContextResult contextResult = findFileAndParentContext(path);
         EntityPathContext context = contextResult.getContext();
@@ -170,6 +186,21 @@ public class EntityPathContext {
 
         public String getFileName() {
             return fileName;
+        }
+
+        @Override
+        public int hashCode() {
+            return context.hashCode() + fileName.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof ContextResult) {
+                ContextResult other = (ContextResult) obj;
+                return this.context.equals(other.context) &&
+                       this.fileName.equals(other.fileName);
+            }
+            return false;
         }
     }
 
