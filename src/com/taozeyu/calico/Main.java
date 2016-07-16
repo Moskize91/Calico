@@ -2,6 +2,7 @@ package com.taozeyu.calico;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import com.taozeyu.calico.copier.ResourceFileCopier;
@@ -28,20 +29,7 @@ public class Main {
                 System.exit(0);
             }
         }
-        RuntimeContext runtimeContext = new RuntimeContext();
-        runtimeContext.setSystemEntityDirectory(new File(getHomePath()));
-
-        File moduleDirectory = runtimeContext.getSystemEntityDirectory();
-        EntityPathContext entityPathContext = new EntityPathContext(
-                runtimeContext,
-                EntityPathContext.EntityType.JavaScript,
-                EntityPathContext.EntityModule.SystemLibrary,
-                new File(moduleDirectory, "lang"), "/");
-        ScriptContext initScriptContext = new ScriptContext(
-                entityPathContext,
-                runtimeContext);
-        System.out.println(initScriptContext.engine().eval("__script_context.require(1)(2, 5)"));
-
+        RuntimeContext runtimeContext = configureRuntimeContext();
 
         if (true) {
             return;
@@ -72,6 +60,51 @@ public class Main {
 			throw new RuntimeException("Unknown command "+ command);
 		}
 	}
+
+    private static RuntimeContext configureRuntimeContext() throws ScriptException {
+        RuntimeContext runtimeContext = new RuntimeContext();
+        runtimeContext.setSystemEntityDirectory(new File(getHomePath()));
+
+        File calicoDirectory = new File(System.getProperty("user.dir"));
+        EntityPathContext entityPathContext = new EntityPathContext(
+                runtimeContext,
+                EntityPathContext.EntityType.JavaScript,
+                EntityPathContext.EntityModule.Library,
+                calicoDirectory, "/");
+        ScriptContext initScriptContext = new ScriptContext(
+                entityPathContext,
+                runtimeContext);
+        Object calicoInitialization = initScriptContext.require("/lang/calico_initialization");
+        initScriptContext.engine().put("__calico_initialization", calicoInitialization);
+
+        String head = "var __calico_configuration = new __calico_initialization.Configuration();" +
+                      "(function(configure) {" +
+                      "var __calico_configuration = undefined;\n"; //mask variables
+        String footer = "}) (__calico_configuration.configure);\n";
+        InputStream configurationInputStream = entityPathContext.inputStreamOfFile(".calico");
+        initScriptContext.loadScriptFile(configurationInputStream, head, footer);
+
+        String templateDirectory = (String) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_string('template_directory')");
+        String targetDirectory = (String) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_string('target_directory')");
+        String rootPage = (String) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_string('root_page')");
+
+        runtimeContext.setTemplateDirectory(getDirectoryWithPath(templateDirectory));
+        runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
+        runtimeContext.setRootPage(rootPage);
+
+        return runtimeContext;
+    }
+
+    private static File getDirectoryWithPath(String path) {
+        if (PathUtil.isAbsolutePath(path)) {
+            return new File(path);
+        } else {
+            return new File(System.getProperty("user.dir"), path);
+        }
+    }
 
     private static String getHomePath() {
         String path = Main.class.getResource("Main.class").toString();

@@ -9,7 +9,9 @@ import java.util.Map;
 public class RuntimeContext {
 
     private File templateDirectory;
+    private File targetDirectory;
     private File systemEntityDirectory;
+    private String rootPage;
     private Map<String, File> librerayDirectoryMap;
 
     public File getTemplateDirectory() {
@@ -18,6 +20,22 @@ public class RuntimeContext {
 
     public void setTemplateDirectory(File templateDirectory) {
         this.templateDirectory = templateDirectory;
+    }
+
+    public File getTargetDirectory() {
+        return targetDirectory;
+    }
+
+    public void setTargetDirectory(File targetDirectory) {
+        this.targetDirectory = targetDirectory;
+    }
+
+    public String getRootPage() {
+        return rootPage;
+    }
+
+    public void setRootPage(String rootPage) {
+        this.rootPage = rootPage;
     }
 
     public File getSystemEntityDirectory() {

@@ -83,11 +83,18 @@ public class ScriptContext {
     }
 
     public Object loadScriptFile(InputStream inputStream) {
+        String head = "var __require_module = {}" +
+                      "(function(require, M) {\n";
+        String footer = "\n}) (__require, __require_module);\n" +
+                        "__require_module;";
+        return loadScriptFile(inputStream, head, footer);
+    }
+
+    public Object loadScriptFile(InputStream inputStream, String head, String footer) {
+        head += "var __require = undefined;" + // mask for user's code.
+                "var __require_module = undefined;" + // mask for user's code.
+                "var __script_context = undefined;\n"; // mask for user's code.
         Reader reader = new InputStreamReader(inputStream);
-        String head = "(function(require) {" +
-                      "var __require = undefined;" + // mask for user's code.
-                      "var __script_context = undefined;\n"; // mask for user's code.
-        String footer = "\n}) (__require);";
         return new WrapReader(reader, head, footer);
     }
 
