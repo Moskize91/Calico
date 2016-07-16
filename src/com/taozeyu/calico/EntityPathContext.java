@@ -30,7 +30,7 @@ public class EntityPathContext {
         this.absolutionPath = absolutionPath;
     }
 
-    public boolean fileExist(String path) {
+    public boolean entityExist(String path) {
         EntityPathContext context = contextOfFile(path);
         String fileName = fileName(path);
         if (context.entityModule == EntityModule.SystemLibrary &&
