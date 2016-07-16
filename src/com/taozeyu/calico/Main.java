@@ -31,17 +31,13 @@ public class Main {
         }
         RuntimeContext runtimeContext = configureRuntimeContext();
 
-		File targetPath = GlobalConfig.instance().getFile("target", "./");
-		File templatePath = GlobalConfig.instance().getFile("template", "./template");
-		File resourcePath = GlobalConfig.instance().getFile("resource", "./resource");
-
-		ResourceManager resource = new ResourceManager(resourcePath);
+		ResourceManager resource = new ResourceManager(runtimeContext.getResourceDirecotry());
 		Router router = new Router(runtimeContext, resource);
 
 		String command = argumentsHandler.getCommand();
 
 		if (command.toLowerCase().equals("build")) {
-			build(router, targetPath, templatePath);
+//			build(router, targetPath, templatePath);
 
 		} else if (command.toLowerCase().equals("service")) {
 			service(router);
@@ -53,7 +49,7 @@ public class Main {
 
     private static RuntimeContext configureRuntimeContext() throws ScriptException {
         RuntimeContext runtimeContext = new RuntimeContext();
-        runtimeContext.setSystemEntityDirectory(new File(getHomePath()));
+        runtimeContext.setSystemEntityDirectory(new File(getHomePath(), "lang"));
 
         File calicoDirectory = new File(System.getProperty("user.dir"));
         EntityPathContext entityPathContext = new EntityPathContext(
@@ -71,9 +67,11 @@ public class Main {
                       "(function(configure) {" +
                       "var __calico_configuration = undefined;\n"; //mask variables
         String footer = "}) (__calico_configuration.configure);\n";
-        InputStream configurationInputStream = entityPathContext.inputStreamOfFile(".calico");
-        initScriptContext.loadScriptFile(configurationInputStream, head, footer);
 
+        if (entityPathContext.entityExist(".calico")) {
+            InputStream configurationInputStream = entityPathContext.inputStreamOfFile(".calico");
+            initScriptContext.loadScriptFile(configurationInputStream, head, footer);
+        }
         String templateDirectory = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('template_directory')");
         String targetDirectory = (String) initScriptContext.engine()

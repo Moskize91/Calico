@@ -75,7 +75,7 @@ public class ScriptContext {
             ScriptContext subcontext = new ScriptContext(rootScriptContext,
                     result.getContext(),
                     runtimeContext);
-            InputStream inputStream = entityPathContext.inputStreamOfFile(path);
+            InputStream inputStream = entityPathContext.inputStreamOfFile(path + ".js");
             requiredObject = subcontext.loadScriptFile(inputStream);
             rootScriptContext.requiredCache.put(result, requiredObject);
         }

@@ -49,7 +49,7 @@ public class EntityPathContext {
         String fileName = contextResult.getFileName();
         if (context.entityModule == EntityModule.SystemLibrary &&
                 context.moduleDirectory == null) {
-            path = "/lang"+ context.absolutionPath + "/" + fileName;
+            path = context.absolutionPath + "/" + fileName;
             ClassLoader loader = getClass().getClassLoader();
             return loader.getResource(path) != null;
         } else {
@@ -79,7 +79,7 @@ public class EntityPathContext {
             context.moduleDirectory == null) {
             String parentPath = context.absolutionPath;
             parentPath = parentPath.replaceAll("/$", "");
-            path = "/lang"+ parentPath + "/" + fileName;
+            path = parentPath + "/" + fileName;
             ClassLoader loader = getClass().getClassLoader();
             return loader.getResourceAsStream(path);
         } else {
@@ -95,8 +95,12 @@ public class EntityPathContext {
     public ContextResult findFileAndParentContext(String path) {
         int beginIndexOfFileName = beginIndexOfFileNameWithPath(path);
         String contextPath = path.substring(0, beginIndexOfFileName);
-        String fileName = contextPath.substring(beginIndexOfFileName);
-        return new ContextResult(findContext(contextPath), fileName);
+        String fileName = path.substring(beginIndexOfFileName);
+        if ("".equals(contextPath)) {
+            contextPath = "./";
+        }
+        EntityPathContext context = findContext(contextPath);
+        return new ContextResult(context, fileName);
     }
 
     private int beginIndexOfFileNameWithPath(String path) {
@@ -122,12 +126,12 @@ public class EntityPathContext {
         File moduleDirectory = null;
         EntityModule module = null;
 
-        if (moduleName.equals("calico") &&
+        if (moduleName.equals("lang") &&
             (EntityModule.Template == entityModule ||
             EntityModule.Library == entityModule)) {
             moduleDirectory = runtimeContext.getSystemEntityDirectory();
             module = EntityModule.SystemLibrary;
-        } else if (!moduleName.equals("calico") &&
+        } else if (!moduleName.equals("lang") &&
                     EntityModule.Template == entityModule) {
             moduleDirectory = runtimeContext.getLibrerayDirectoryMap().get(moduleName);
             module = EntityModule.Library;
@@ -135,7 +139,7 @@ public class EntityPathContext {
         if (moduleDirectory == null) {
             return null;
         }
-        components = Arrays.copyOfRange(components, 1, components.length - 1);
+        components = Arrays.copyOfRange(components, 0, components.length - 1);
         boolean isRoot = true;
         absolutePath = PathUtil.pathFromComponents(components, isRoot);
         return new EntityPathContext(runtimeContext,
