@@ -71,6 +71,8 @@ public class Main {
         if (entityPathContext.entityExist(".calico")) {
             InputStream configurationInputStream = entityPathContext.inputStreamOfFile(".calico");
             initScriptContext.loadScriptFile(configurationInputStream, head, footer);
+        } else {
+            initScriptContext.engine().eval(head + footer);
         }
         String templateDirectory = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('template_directory')");

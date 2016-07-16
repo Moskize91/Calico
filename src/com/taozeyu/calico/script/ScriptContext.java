@@ -82,7 +82,7 @@ public class ScriptContext {
         return requiredObject;
     }
 
-    public Object loadScriptFile(InputStream inputStream) {
+    public Object loadScriptFile(InputStream inputStream) throws ScriptException {
         String head = "var __require_module = {}" +
                       "(function(require, M) {\n";
         String footer = "\n}) (__require, __require_module);\n" +
@@ -90,12 +90,13 @@ public class ScriptContext {
         return loadScriptFile(inputStream, head, footer);
     }
 
-    public Object loadScriptFile(InputStream inputStream, String head, String footer) {
+    public Object loadScriptFile(InputStream inputStream, String head, String footer) throws ScriptException {
         head += "var __require = undefined;" + // mask for user's code.
                 "var __require_module = undefined;" + // mask for user's code.
                 "var __script_context = undefined;\n"; // mask for user's code.
         Reader reader = new InputStreamReader(inputStream);
-        return new WrapReader(reader, head, footer);
+        reader = new WrapReader(reader, head, footer);
+        return engine.eval(reader);
     }
 
     private static class WrapReader extends Reader {
