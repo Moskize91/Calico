@@ -1,8 +1,6 @@
 package com.taozeyu.calico;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 
 import com.taozeyu.calico.copier.ResourceFileCopier;
@@ -76,12 +74,15 @@ public class Main {
                       "var __calico_configuration = undefined;\n"; //mask variables
         String footer = "}) (__calico_configuration.configure);\n";
 
-        if (entityPathContext.entityExist(".calico")) {
-            InputStream configurationInputStream = entityPathContext.inputStreamOfFile(".calico");
+        File calicoConfigurationFile = new File(System.getProperty("user.dir"), ".calico");
+        try {
+            InputStream configurationInputStream = new FileInputStream(calicoConfigurationFile);
             initScriptContext.loadScriptFile(configurationInputStream, head, footer);
-        } else {
+        } catch (FileNotFoundException e) {
+            // .calico not exist.
             initScriptContext.engine().eval(head + footer);
         }
+
         String templateDirectory = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('template_directory')");
         String targetDirectory = (String) initScriptContext.engine()
