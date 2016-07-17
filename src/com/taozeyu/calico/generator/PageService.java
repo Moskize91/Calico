@@ -32,8 +32,16 @@ public class PageService {
         try (Reader reader = getTemplateReader()){
             ScriptContext scriptContext = createScriptContext();
             String pageContent = getFileContentFromReader(reader);
-            scriptContext.loadViewScriptFile(pageContent, new HashMap<String, Object>() {{
-                put("R", resource);
+            scriptContext.loadViewScriptFile(pageContent, printStream,
+                                             new HashMap<String, Object>() {{
+                put("R", callJavaScript(
+                        scriptContext, resource, "__resource",
+                        "__require('/system/resource_manager').generate_R(__resource)"
+                ));
+                put("out", callJavaScript(
+                        scriptContext, printStream, "__print_stream",
+                        "new (__require('/system/print_stream').Printer)(__print_stream)"
+                ));
                 put("params", params);
                 put("template", pageAbsolutionPath);
             }});
@@ -41,6 +49,13 @@ public class PageService {
             System.err.println("Error"+e.getMessage()+"(from "+ pageAbsolutionPath +")");
             throw e;
         }
+    }
+
+    private Object callJavaScript(ScriptContext scriptContext, Object param, String paramName, String command) throws ScriptException {
+        scriptContext.engine().put(paramName, param);
+        Object object = scriptContext.engine().eval(command);
+        scriptContext.engine().eval(paramName + " = undefined");
+        return object;
     }
 
     private ScriptContext createScriptContext() throws IOException, ScriptException {

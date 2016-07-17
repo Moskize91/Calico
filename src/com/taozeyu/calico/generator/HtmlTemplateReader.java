@@ -8,10 +8,10 @@ class HtmlTemplateReader extends AllowFillReader {
 	// Nashorn would limit JavaScript code line.
 	private static final int PrintCharNumLimit = 500;
 	
-	private static final String PrintStringHead = "print('";
+	private static final String PrintStringHead = "out.print('";
 	private static final String PrintStringTail = "');\n";
 	
-	private static final String PrintExpressionHead = "print(";
+	private static final String PrintExpressionHead = "out.print(";
 	private static final String PrintExpressionTail = ");\n";
 	
 	private final StringEscapeReader reader;

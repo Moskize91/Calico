@@ -2,6 +2,7 @@ package com.taozeyu.calico.script;
 
 import com.taozeyu.calico.EntityPathContext;
 import com.taozeyu.calico.RuntimeContext;
+import com.taozeyu.calico.generator.Printer;
 import com.taozeyu.calico.util.PathUtil;
 
 import javax.script.ScriptEngine;
@@ -91,7 +92,7 @@ public class ScriptContext {
         return loadScriptFile(inputStream, head, footer);
     }
 
-    public Object loadViewScriptFile(String viewContent, Map<String, Object> params) throws ScriptException {
+    public Object loadViewScriptFile(String viewContent, Printer printStream, Map<String, Object> params) throws ScriptException {
         String head = "(function(require";
         String footer = "\n}) (__require";
         for (String paramName : params.keySet()) {
