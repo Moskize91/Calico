@@ -24,19 +24,28 @@ public class Router {
 	public Router(RuntimeContext runtimeContext, ResourceManager resource) {
 		this.runtimeContext = runtimeContext;
 		this.resource = resource;
+		this.routeDir = runtimeContext.getTemplateDirectory();
+
+		File assetEntityModule = new File(
+				runtimeContext.getTemplateDirectory(),
+				EntityPathContext.EntityType.Asset.getDirectoryName()
+		);
+		File pageEntityModule = new File(
+				runtimeContext.getTemplateDirectory(),
+				EntityPathContext.EntityType.Page.getDirectoryName()
+		);
 		this.assetEntity = new EntityPathContext(
 				runtimeContext,
 				EntityPathContext.EntityType.Asset,
 				EntityPathContext.EntityModule.Template,
-				runtimeContext.getTemplateDirectory(), "/"
+				assetEntityModule, "/"
 		);
 		this.pageEntity = new EntityPathContext(
 				runtimeContext,
 				EntityPathContext.EntityType.Page,
 				EntityPathContext.EntityModule.Template,
-				runtimeContext.getTemplateDirectory(), "/"
+				pageEntityModule, "/"
 		);
-		this.routeDir = runtimeContext.getTemplateDirectory();
 	}
 
 	public boolean existAsset(String relativePath) {

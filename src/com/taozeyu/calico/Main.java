@@ -108,7 +108,7 @@ public class Main {
         if (PathUtil.isAbsolutePath(path)) {
             return new File(path);
         } else {
-            return new File(System.getProperty("user.dir"), path);
+            return new File(PathUtil.pathMerge(System.getProperty("user.dir"), path));
         }
     }
 
