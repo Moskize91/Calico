@@ -19,13 +19,10 @@ public class Router {
 	private final EntityPathContext assetEntity;
 	private final EntityPathContext pageEntity;
 	private final ResourceManager resource;
-	private final File routeDir;
 	
 	public Router(RuntimeContext runtimeContext, ResourceManager resource) {
 		this.runtimeContext = runtimeContext;
 		this.resource = resource;
-		this.routeDir = runtimeContext.getTemplateDirectory();
-
 		this.assetEntity = new EntityPathContext(
 				runtimeContext,
 				EntityPathContext.EntityType.Asset,
@@ -63,9 +60,7 @@ public class Router {
 	}
 
 	public PageService getPageService(String absolutePath) {
-
 		String targetPath = PathUtil.normalizePathAndCleanExtensionName(absolutePath);
-
 		if(targetPath.equals(RootPath)) {
 			targetPath = runtimeContext.getRootPage();
 		}
@@ -74,8 +69,8 @@ public class Router {
 
 	private PageService getPageServiceWithNormalizeTargetPath(String absolutePath) {
 		if (pageEntity.entityExist(absolutePath)) {
-			File targetPathTemplateFile = pageEntity.entityFile(absolutePath);String params = "";
-			return new PageService(runtimeContext, resource, targetPathTemplateFile, routeDir, params);
+			String params = "";
+			return new PageService(runtimeContext, resource, absolutePath, params);
 		} else {
 			String extensionName = PathUtil.getExtensionName(absolutePath);
 			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
@@ -88,13 +83,12 @@ public class Router {
 	}
 
 	private PageService createPageService(String[] pathCells, String extensionName) {
-		
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
 		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
-		File templatePath = getTemplatePath(path, extensionName);
-		if (templatePath != null) {
+		String validPagePath = findValidPagePath(path, extensionName);
+		if (validPagePath != null) {
 			String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
-			return new PageService(runtimeContext, resource, templatePath, routeDir, params);
+			return new PageService(runtimeContext, resource, validPagePath, params);
 		}
 		return null;
 	}
@@ -135,19 +129,15 @@ public class Router {
 		return params;
 	}
 
-	private boolean isTemplateFile(File file) {
-		return file.exists() || file.isFile();
-	}
-
-	private File getTemplatePath(String dirPath, String extensionName) {
-		File file = new File(routeDir.getPath(), dirPath + "." + extensionName);
-		if (isTemplateFile(file)) {
-			return file;
+	private String findValidPagePath(String dirPath, String extensionName) {
+		String path = dirPath + "." + extensionName;
+		if (pageEntity.entityExist(path)) {
+			return path;
 		}
 		extensionName = normalizeIndexFileExtensionName(extensionName);
-		file = new File(routeDir.getPath(), dirPath + "/index." + extensionName);
-		if (isTemplateFile(file)) {
-			return file;
+		path = dirPath + "/index." + extensionName;
+		if (pageEntity.entityExist(path)) {
+			return path;
 		}
 		return null;
 	}

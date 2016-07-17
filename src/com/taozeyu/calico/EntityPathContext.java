@@ -135,7 +135,7 @@ public class EntityPathContext {
     }
 
     public EntityPathContext findContext(String path) {
-        String absolutePath = getPathByThisContext(path);
+        String absolutePath = absolutionPathOfThis(path);
         if (absolutePath.equals(this.absolutionPath)) {
             return this;
         }
@@ -168,10 +168,10 @@ public class EntityPathContext {
                                      module, absolutePath);
     }
 
-    private String getPathByThisContext(String path) {
-        String mergedPath = PathUtil.pathMerge(this.absolutionPath, path);
+    public String absolutionPathOfThis(String relativePath) {
+        String mergedPath = PathUtil.pathMerge(this.absolutionPath, relativePath);
         if (mergedPath == null) {
-            throw new EntityPathContextException("invalid path `"+ path + "`");
+            throw new EntityPathContextException("invalid path `"+ relativePath + "`");
         }
         return mergedPath;
     }

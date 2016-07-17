@@ -1,8 +1,8 @@
 package com.taozeyu.calico.generator;
 
+import com.taozeyu.calico.EntityPathContext;
+
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,24 +11,22 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
-import com.taozeyu.calico.GlobalConfig;
-
-
 class RequireListReader extends AllowFillReader {
 
 	private static final int BufferedSize = 1024;
-	private static final Pattern RequirePattern = Pattern.compile("^/?(\\w|\\-|\\.)+(/(\\w|\\-|\\.)+)*$");
+	private static final Pattern RequirePattern = Pattern.compile("^/?(\\w|-|\\.)+(/(\\w|-|\\.)+)*$");
 	
 	private final Reader reader;
 	private final RequireListReader parent;
-	private final File readFile;
-	private final File routeDir;
-	
+	private final EntityPathContext entityPathContext;
+	private final String requirePagePath;
+
 	private RequireListReader nextReader = null;
 	private RequireListReader yieldReader = null;
 	
-	RequireListReader(File readFile, File routeDir) throws IOException {
-		this(null, readFile, routeDir);
+	RequireListReader(EntityPathContext entityPathContext,
+					  String requirePagePath) throws IOException {
+		this(null, entityPathContext, requirePagePath);
 	}
 
 	void setYieldReader(RequireListReader reader) {
@@ -36,25 +34,32 @@ class RequireListReader extends AllowFillReader {
 	}
 
     RequireListReader getLayoutRequireListReader() throws IOException {
-        File layoutFile = getFileByRequireInfo("layout.html");
-        if (!requireInfoHasNoError(layoutFile)) {
-            layoutFile = getFileByRequireInfo("/layout.html");
-        }
-        if (requireInfoHasNoError(layoutFile)) {
-            return new RequireListReader(null, layoutFile, routeDir);
-        }
-        return null;
+    	EntityPathContext context = entityPathContext.findContext(requirePagePath);
+		String layoutPath = "layout.html";
+		if (!context.entityExist(layoutPath) ||
+			isRequirePathInRequireList(context.absolutionPathOfThis(layoutPath))) {
+			context = entityPathContext.findContext("/");
+			layoutPath = "/layout.html";
+		}
+		if (!context.entityExist(layoutPath) ||
+			isRequirePathInRequireList(context.absolutionPathOfThis(layoutPath))) {
+			return null;
+		}
+        return new RequireListReader(context, layoutPath);
     }
 
-	private RequireListReader(RequireListReader parent, File readFile,  File routeDir) throws IOException {
-		this.reader =  createReader(readFile);
+	private RequireListReader(RequireListReader parent,
+							  EntityPathContext entityPathContext,
+							  String requirePagePath) throws IOException {
 		this.parent = parent;
-		this.readFile = readFile;
-		this.routeDir = routeDir;
+		this.entityPathContext = entityPathContext;
+		this.requirePagePath = requirePagePath;
+		this.reader = createReader(entityPathContext, requirePagePath);
 	}
 
-	private Reader createReader(File file) throws FileNotFoundException {
-		InputStream inputStream = new FileInputStream(file);
+	private Reader createReader(EntityPathContext entityPathContext,
+								String requirePagePath) throws FileNotFoundException {
+		InputStream inputStream = entityPathContext.inputStreamOfFile(requirePagePath);
 		inputStream = new BufferedInputStream(inputStream, BufferedSize);
 		return new InputStreamReader(inputStream, Charset.forName("UTF-8"));
 	}
@@ -139,61 +144,35 @@ class RequireListReader extends AllowFillReader {
 			yieldReader = null;
 		} else {
 			checkRequireInfoFormatError(requireInfo);
-			File requireTemplateFile = getFileByRequireInfo(requireInfo);
-			checkRequireFileError(requireTemplateFile);
-			nextListReader = new RequireListReader(this, requireTemplateFile, routeDir);
+			if (!entityPathContext.entityExist(requireInfo)) {
+				throw new TemplateException("template file not found `"+ requireInfo + "`.");
+			}
+			EntityPathContext.ContextResult result = entityPathContext.findFileAndParentContext(requireInfo);
+			nextListReader = new RequireListReader(result.getContext(), result.getFileName());
 		}
 		return nextListReader;
 	}
 
 	private void checkRequireInfoFormatError(String requireInfo) {
 		if(!RequirePattern.matcher(requireInfo).matches()) {
-			throw new TemplateException("require format error '"+ requireInfo + "'.");
-		}
-	}
-
-    private File getFileByRequireInfo(String requireInfo) {
-        File requireTemplateFile;
-        if(isAbosultePath(requireInfo)) {
-            requireTemplateFile = new File(routeDir, requireInfo);
-        } else {
-            requireTemplateFile = new File(readFile.getParent(), requireInfo);
-        }
-        return requireTemplateFile;
-    }
-
-    private boolean isAbosultePath(String requireInfo) {
-		return requireInfo.startsWith("/");
-	}
-
-    private boolean requireInfoHasNoError(File requireTemplateFile) {
-        try {
-            checkRequireFileError(requireTemplateFile);
-            return true;
-        } catch (TemplateException e) {
-            return false;
-        }
-    }
-
-    private void checkRequireFileError(File requireTemplateFile) {
-		if(!requireTemplateFile.exists() || !requireTemplateFile.isFile()) {
-			throw new TemplateException("not found template file '"+ requireTemplateFile.getPath() + "'.");
-		}
-		if(isFileInRequireList(requireTemplateFile)) {
-			throw new TemplateException("found circular reference, file has been required '"+ requireTemplateFile.getPath() + "'.");
+			throw new TemplateException("require format error `"+ requireInfo + "`.");
 		}
 	}
 
 	@SuppressWarnings("resource")
-	private boolean isFileInRequireList(File targetFile) {
+	private boolean isRequirePathInRequireList(String absolutionRequirePath) {
 		for(RequireListReader reader = this; reader != null; reader = reader.parent) {
-			if(reader.readFile.equals(targetFile)) {
+			if (absolutionRequirePath.equals(reader.absolutionRequirePagePath())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
+	private String absolutionRequirePagePath() {
+		return entityPathContext.absolutionPathOfThis(requirePagePath);
+	}
+
 	@Override
 	public void close() throws IOException {
 		reader.close();

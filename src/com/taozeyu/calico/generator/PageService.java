@@ -17,15 +17,13 @@ public class PageService {
     private final RuntimeContext runtimeContext;
     private final ResourceManager resource;
 
-    private final File templatePath;
-    private final File routeDir;
+    private final String pageAbsolutionPath;
     private final String params;
 
-    PageService(RuntimeContext runtimeContext, ResourceManager resource, File templatePath, File routeDir, String params) {
+    PageService(RuntimeContext runtimeContext, ResourceManager resource, String pageAbsolutionPath, String params) {
         this.runtimeContext = runtimeContext;
         this.resource = resource;
-        this.templatePath = templatePath;
-        this.routeDir = routeDir;
+        this.pageAbsolutionPath = pageAbsolutionPath;
         this.params = params;
     }
 
@@ -37,10 +35,9 @@ public class PageService {
             scriptContext.loadViewScriptFile(pageContent, new HashMap<String, Object>() {{
                 put("resource", resource);
                 put("params", params);
-                put("template", getTemplatePathOfProject());
             }});
         } catch (ScriptException e) {
-            System.err.println("Error"+e.getMessage()+"(from "+ templatePath.getPath()+")");
+            System.err.println("Error"+e.getMessage()+"(from "+ pageAbsolutionPath +")");
             throw e;
         }
     }
@@ -52,6 +49,15 @@ public class PageService {
                 EntityPathContext.EntityModule.Template, "/"
         );
         return new ScriptContext(entityPathContext, runtimeContext);
+    }
+
+    private EntityPathContext createPageRelativeEntityPathContext() {
+        EntityPathContext rootContext = new EntityPathContext(
+                runtimeContext,
+                EntityPathContext.EntityType.Page,
+                EntityPathContext.EntityModule.Template, "/"
+        );
+        return rootContext.findContext(pageAbsolutionPath);
     }
 
     // Nashorn engine would omit some content if read from a long stream.
@@ -66,7 +72,10 @@ public class PageService {
     }
 
     private Reader getTemplateReader() throws IOException {
-        RequireListReader templateReader = new RequireListReader(templatePath, routeDir);
+        RequireListReader templateReader = new RequireListReader(
+                createPageRelativeEntityPathContext(),
+                pageAbsolutionPath
+        );
         RequireListReader layoutReader = templateReader.getLayoutRequireListReader();
         if (layoutReader != null) {
             layoutReader.setYieldReader(templateReader);
@@ -74,9 +83,5 @@ public class PageService {
         } else {
             return new HtmlTemplateReader(templateReader);
         }
-    }
-
-    private String getTemplatePathOfProject() {
-        return templatePath.getPath().substring(routeDir.getPath().length());
     }
 }
