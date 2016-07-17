@@ -42,6 +42,9 @@ public class PageService {
                         scriptContext, printStream, "__print_stream",
                         "new (__require('/system/print_stream').Printer)(__print_stream)"
                 ));
+                put("session", scriptContext.engine().eval(
+                        "new (__require('/system/session').Session)();"
+                ));
                 put("params", params);
                 put("template", pageAbsolutionPath);
             }});

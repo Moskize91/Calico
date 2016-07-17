@@ -1,6 +1,6 @@
 // calico system library
 
-M.generate_R = function(resource) {
+var wrap = function(resource) {
 
     var R = {};
 
@@ -55,3 +55,4 @@ M.generate_R = function(resource) {
     }
     return R;
 };
+M.generate_R = wrap;

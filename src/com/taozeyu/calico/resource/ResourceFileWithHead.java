@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +89,7 @@ public class ResourceFileWithHead {
 	private Reader createResourceFileReader() throws FileNotFoundException {
 		InputStream inputStream = new FileInputStream(resourceFile);
 		inputStream = new BufferedInputStream(inputStream, ReadAttributeBufferedSize);
-		return new InputStreamReader(inputStream, GlobalConfig.instance().getCharset());
+		return new InputStreamReader(inputStream, Charset.forName("UTF-8"));
 	}
 	
 	private void collectLineMessageIntoAttributes(Map<String, String> attributeMap, String line) {
