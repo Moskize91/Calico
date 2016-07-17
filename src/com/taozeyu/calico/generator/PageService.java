@@ -33,8 +33,9 @@ public class PageService {
             ScriptContext scriptContext = createScriptContext();
             String pageContent = getFileContentFromReader(reader);
             scriptContext.loadViewScriptFile(pageContent, new HashMap<String, Object>() {{
-                put("resource", resource);
+                put("R", resource);
                 put("params", params);
+                put("template", pageAbsolutionPath);
             }});
         } catch (ScriptException e) {
             System.err.println("Error"+e.getMessage()+"(from "+ pageAbsolutionPath +")");
