@@ -73,7 +73,8 @@ public class Router {
 			return new PageService(runtimeContext, resource, absolutePath, params);
 		} else {
 			String extensionName = PathUtil.getExtensionName(absolutePath);
-			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
+			String noExtensionNamePath = PathUtil.clearExtensionName(clearHeadTailSlash(absolutePath));
+			String pathCells[] = noExtensionNamePath.split("/");
 			return createPageService(pathCells, extensionName);
 		}
 	}
@@ -84,11 +85,13 @@ public class Router {
 
 	private PageService createPageService(String[] pathCells, String extensionName) {
 		int endOfExistDirIndex = findEndOfExistDirIndex(pathCells, extensionName);
-		String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
-		String validPagePath = findValidPagePath(path, extensionName);
-		if (validPagePath != null) {
-			String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
-			return new PageService(runtimeContext, resource, validPagePath, params);
+		if (endOfExistDirIndex != -1) {
+			String path = getTemplateDirPath(pathCells, endOfExistDirIndex);
+			String validPagePath = findValidPagePath(path, extensionName);
+			if (validPagePath != null) {
+				String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
+				return new PageService(runtimeContext, resource, validPagePath, params);
+			}
 		}
 		return null;
 	}
@@ -106,14 +109,13 @@ public class Router {
 
 	private int findEndOfExistDirIndex(String[] pathCells, String extensionName) {
 		int endOfExistDirIndex = -1;
-		File path = new File("");
-		for(int i=0; i<pathCells.length; ++i) {
-			String pathCell = pathCells[i] + "." + extensionName;
-			path = new File(path, pathCell);
-			if(pageEntity.entityExist(path.getPath())) {
-				break;
+		String basicPath = "";
+		for(int i = 0; i < pathCells.length; ++ i) {
+			basicPath += "/"+ pathCells[i];
+			String pathCell = basicPath + "." + extensionName;
+			if(pageEntity.entityExist(pathCell)) {
+				endOfExistDirIndex = i;
 			}
-			endOfExistDirIndex = i;
 		}
 		return endOfExistDirIndex;
 	}
