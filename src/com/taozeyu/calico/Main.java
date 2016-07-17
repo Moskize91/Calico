@@ -40,12 +40,22 @@ public class Main {
 //			build(router, targetPath, templatePath);
 
 		} else if (command.toLowerCase().equals("service")) {
-			service(router);
+			service(runtimeContext, router);
 
 		} else {
 			throw new RuntimeException("Unknown command "+ command);
 		}
 	}
+
+    private static void service(RuntimeContext runtimeContext, Router router) throws IOException, InterruptedException {
+        final WebService webService = new WebService(runtimeContext, router);
+        webService.start();
+        System.out.println( "\nRunning! Point your browser to http://127.0.0.1:"+ webService.getListeningPort() +"/ \n" );
+        waitForCtrlCHook(() -> {
+            webService.closeAllConnections();
+            System.out.println("Press Ctrl+C to shutdown service.");
+        });
+    }
 
     private static RuntimeContext configureRuntimeContext() throws ScriptException {
         RuntimeContext runtimeContext = new RuntimeContext();
@@ -82,8 +92,8 @@ public class Main {
                 .eval("__calico_configuration.value_of_string('resource_directory')");
         String rootPage = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('root_page')");
-        int port = (int) initScriptContext.engine()
-                .eval("__calico_configuration.value_of_integer('port')");
+        int port = (int) ((Double) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_integer('port')")).doubleValue();
 
         runtimeContext.setTemplateDirectory(getDirectoryWithPath(templateDirectory));
         runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
@@ -126,22 +136,6 @@ public class Main {
 		new TargetDirectoryCleaner(targetPath).clean();
 		new ResourceFileCopier(templatePath, targetPath).copy();
 		new ContentBuilder(router, targetPath).buildFromRootFile();
-	}
-
-	private static void service(Router router) throws IOException, InterruptedException {
-		final WebService webService = new WebService(router);
-		webService.start();
-		System.out.println( "\nRunning! Point your browser to http://127.0.0.1:"+ webService.getListeningPort() +"/ \n" );
-		waitForCtrlCHook(() -> {
-            webService.closeAllConnections();
-            System.out.println("Press Ctrl+C to shutdown service.");
-        });
-	}
-
-	private static void checkArgs(String[] args) {
-		if (args.length != 1) {
-			throw new RuntimeException("Need just only ONE argument!");
-		}
 	}
 
 	private static void waitForCtrlCHook(Runnable whenShutdown) throws InterruptedException {

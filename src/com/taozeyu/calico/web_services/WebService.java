@@ -1,6 +1,7 @@
 package com.taozeyu.calico.web_services;
 
 import com.taozeyu.calico.GlobalConfig;
+import com.taozeyu.calico.RuntimeContext;
 import com.taozeyu.calico.generator.PageService;
 import com.taozeyu.calico.generator.Router;
 import com.taozeyu.calico.util.PathUtil;
@@ -21,6 +22,9 @@ public class WebService extends NanoHTTPD {
 
     private static final Map<String, String> ContentTypeMap = new HashMap<>();
     private static final String UnknownType = "application/octet-stream";
+    private static final String[] NotResourceExtensionNames = new String[] {
+            "html", "htm", "",
+    };
 
     private static String[][] getContentTypeData() {
         // TODO We should add all content-type, See this page http://tool.oschina.net/commons
@@ -46,14 +50,12 @@ public class WebService extends NanoHTTPD {
         }
     }
 
-    private static final String[] NotResourceExtensionNames = new String[] {
-        "html", "htm", "",
-    };
-
     private final Router router;
+    private final RuntimeContext runtimeContext;
 
-    public WebService(Router router) {
-        super(GlobalConfig.instance().getInt("port", 8080));
+    public WebService(RuntimeContext runtimeContext, Router router) {
+        super(runtimeContext.getPort());
+        this.runtimeContext = runtimeContext;
         this.router = router;
     }
 
