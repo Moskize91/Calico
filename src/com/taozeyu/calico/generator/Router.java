@@ -11,7 +11,7 @@ import com.taozeyu.calico.util.PathUtil;
 public class Router {
 
 	public static final String RootPath = "/";
-	private static final String[] IndexFilePosibleExtensionNames = new String[]{
+	private static final String[] IndexFilePossibleExtensionNames = new String[]{
 			"html", "htm",
 	};
 
@@ -146,8 +146,8 @@ public class Router {
 
 	private String normalizeIndexFileExtensionName(String extensionName) {
 		extensionName = extensionName.trim();
-		for (String posibleName : IndexFilePosibleExtensionNames) {
-			if (posibleName.equals(extensionName)) {
+		for (String possibleName : IndexFilePossibleExtensionNames) {
+			if (possibleName.equals(extensionName)) {
 				return extensionName;
 			}
 		}
