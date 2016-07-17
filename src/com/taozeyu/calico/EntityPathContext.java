@@ -148,31 +148,11 @@ public class EntityPathContext {
     }
 
     private String getPathByThisContext(String path) {
-        path = PathUtil.toUnixLikeStylePath(path);
-        if (PathUtil.isAbsolutePath(path)) {
-            return path;
+        String mergedPath = PathUtil.pathMerge(this.absolutionPath, path);
+        if (mergedPath == null) {
+            throw new EntityPathContextException("invalid path `"+ path + "`");
         }
-        String[] targetComponents = PathUtil.splitComponents(path);
-        LinkedList<String> components = new LinkedList<>();
-        for (String c : PathUtil.splitComponents(this.absolutionPath)) {
-            components.add(c);
-        }
-        for (String tc : targetComponents) {
-            if (tc.equals(".")) {
-
-            } else if (tc.equals("..")) {
-                if (components.isEmpty()) {
-                    throw new EntityPathContextException("invalid path `"+ path + "`");
-                }
-                components.removeLast();
-            } else {
-                components.add(tc);
-            }
-        }
-        boolean isRoot = true;
-        path = PathUtil.pathFromComponents(
-                components.toArray(new String[components.size()]), isRoot);
-        return path;
+        return mergedPath;
     }
 
     private boolean existDirectory(String absolutionPath, EntityModule module, File moduleDirectory) {

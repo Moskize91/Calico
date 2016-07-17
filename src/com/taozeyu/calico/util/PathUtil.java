@@ -1,6 +1,7 @@
 package com.taozeyu.calico.util;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +50,38 @@ public class PathUtil {
         }
         path = path.replaceFirst("^\\.(/|\\\\)", "");
         return new File(currentDirectoryPath, path);
+    }
+
+    public static String pathMerge(String absolutionPath, String path) {
+        if (!isAbsolutePath(absolutionPath)) {
+            return null;
+        }
+        path = toUnixLikeStylePath(path);
+        if (isAbsolutePath(path)) {
+            return path;
+        }
+        String[] targetComponents = splitComponents(path);
+        LinkedList<String> components = new LinkedList<>();
+        for (String c : splitComponents(absolutionPath)) {
+            components.add(c);
+        }
+        for (String tc : targetComponents) {
+            if (tc.equals(".")) {
+
+            } else if (tc.equals("..")) {
+                if (components.isEmpty()) {
+                    return null;
+                }
+                components.removeLast();
+            } else {
+                components.add(tc);
+            }
+        }
+        boolean isRoot = true;
+        path = pathFromComponents(
+                components.toArray(new String[components.size()]), isRoot
+        );
+        return path;
     }
 
     public static String removeLastPathComponent(String path) {
