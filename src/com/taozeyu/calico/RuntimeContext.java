@@ -8,12 +8,21 @@ import java.util.Map;
  */
 public class RuntimeContext {
 
+    private int port;
     private File templateDirectory;
     private File targetDirectory;
     private File resourceDirecotry;
     private File systemEntityDirectory;
     private String rootPage;
     private Map<String, File> librerayDirectoryMap;
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 
     public File getTemplateDirectory() {
         return templateDirectory;

@@ -64,7 +64,7 @@ public class Main {
         initScriptContext.engine().put("__calico_initialization", calicoInitialization);
 
         String head = "var __calico_configuration = new __calico_initialization.Configuration();" +
-                      "(function(configure) {\n" +
+                      "(function(conf) {\n" +
                       "var __calico_configuration = undefined;\n"; //mask variables
         String footer = "}) (__calico_configuration.configure);\n";
 
@@ -82,11 +82,14 @@ public class Main {
                 .eval("__calico_configuration.value_of_string('resource_directory')");
         String rootPage = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('root_page')");
+        int port = (int) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_integer('port')");
 
         runtimeContext.setTemplateDirectory(getDirectoryWithPath(templateDirectory));
         runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
         runtimeContext.setResourceDirecotry(getDirectoryWithPath(resourceDirectory));
         runtimeContext.setRootPage(rootPage);
+        runtimeContext.setPort(port);
 
         return runtimeContext;
     }
