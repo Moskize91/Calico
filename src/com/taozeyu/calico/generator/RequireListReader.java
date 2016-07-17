@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import com.taozeyu.calico.GlobalConfig;
@@ -55,7 +56,7 @@ class RequireListReader extends AllowFillReader {
 	private Reader createReader(File file) throws FileNotFoundException {
 		InputStream inputStream = new FileInputStream(file);
 		inputStream = new BufferedInputStream(inputStream, BufferedSize);
-		return new InputStreamReader(inputStream, GlobalConfig.instance().getCharset());
+		return new InputStreamReader(inputStream, Charset.forName("UTF-8"));
 	}
 	
 	@Override
