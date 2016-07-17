@@ -84,17 +84,42 @@ public class ScriptContext {
 
     public Object loadScriptFile(InputStream inputStream) throws ScriptException {
         String head = "var __require_module = {};\n" +
-                      "(function(require, M) {\n";
+                      "(function(require, M) {" +
+                      "var __require_module = undefined;\n";
         String footer = "\n}) (__require, __require_module);\n" +
                         "__require_module;";
         return loadScriptFile(inputStream, head, footer);
     }
 
-    public Object loadScriptFile(InputStream inputStream, String head, String footer) throws ScriptException {
+    public Object loadViewScriptFile(String viewContent, Map<String, Object> params) throws ScriptException {
+        String head = "(function(require";
+        String footer = "\n}) (__require";
+        for (String paramName : params.keySet()) {
+            Object paramValue = params.get(paramName);
+            engine.put("__"+ paramName, paramValue);
+            head += ", "+ paramName;
+            footer += ", __"+ paramName;
+        }
+        head += ") {";
+        footer += ");";
+        for (String paramName : params.keySet()) {
+            head += "var __" + paramName + " = undefined;\n";
+        }
         head += "var __require = undefined;" + // mask for user's code.
                 "var __require_module = undefined;" + // mask for user's code.
                 "var __script_context = undefined;\n"; // mask for user's code.
+        return engine.eval(head + viewContent + footer);
+    }
+
+    public Object loadScriptFile(InputStream inputStream, String head, String footer) throws ScriptException {
         Reader reader = new InputStreamReader(inputStream);
+        return loadScriptFile(reader, head, footer);
+    }
+
+    public Object loadScriptFile(Reader reader, String head, String footer) throws ScriptException {
+        head += "var __require = undefined;" + // mask for user's code.
+                "var __require_module = undefined;" + // mask for user's code.
+                "var __script_context = undefined;\n"; // mask for user's code.
         reader = new WrapReader(reader, head, footer);
         return engine.eval(reader);
     }

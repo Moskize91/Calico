@@ -1,6 +1,5 @@
 package com.taozeyu.calico.web_services;
 
-import com.taozeyu.calico.GlobalConfig;
 import com.taozeyu.calico.RuntimeContext;
 import com.taozeyu.calico.generator.PageService;
 import com.taozeyu.calico.generator.Router;

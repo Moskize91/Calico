@@ -1,25 +1,28 @@
 package com.taozeyu.calico.generator;
 
-import com.taozeyu.calico.javascript_helper.JavaScriptLoader;
+import com.taozeyu.calico.EntityPathContext;
+import com.taozeyu.calico.RuntimeContext;
 import com.taozeyu.calico.resource.ResourceManager;
+import com.taozeyu.calico.script.ScriptContext;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.*;
+import java.util.HashMap;
 
 /**
  * Created by taozeyu on 15/10/9.
  */
 public class PageService {
 
+    private final RuntimeContext runtimeContext;
     private final ResourceManager resource;
 
     private final File templatePath;
     private final File routeDir;
     private final String params;
 
-    PageService(ResourceManager resource, File templatePath, File routeDir, String params) {
+    PageService(RuntimeContext runtimeContext, ResourceManager resource, File templatePath, File routeDir, String params) {
+        this.runtimeContext = runtimeContext;
         this.resource = resource;
         this.templatePath = templatePath;
         this.routeDir = routeDir;
@@ -27,35 +30,33 @@ public class PageService {
     }
 
     public void requestPage(Printer printStream) throws IOException, ScriptException {
-        ScriptEngine engine = createScriptEngine();
+
         try (Reader reader = getTemplateReader()){
-            setPrintStreamToEngine(engine, printStream);
-            engine.eval(getFileContentFromReader(reader));
+            ScriptContext scriptContext = createScriptContext();
+            String pageContent = getFileContentFromReader(reader);
+            scriptContext.loadViewScriptFile(pageContent, new HashMap<String, Object>() {{
+                put("resource", resource);
+                put("params", params);
+                put("template", getTemplatePathOfProject());
+            }});
         } catch (ScriptException e) {
             System.err.println("Error"+e.getMessage()+"(from "+ templatePath.getPath()+")");
             throw e;
         }
     }
 
-    private ScriptEngine createScriptEngine() throws IOException, ScriptException {
-        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-        engine.put("__resource", resource);
-        engine.put("params", params);
-        engine.put("template", getTemplatePathOfProject());
-        engine.eval("var session = {}");
-        try {
-            new JavaScriptLoader().loadSystemJavaScriptLib(engine);
-        } catch (ScriptException e) {
-            e.printStackTrace();
-            System.exit(1); //can only exit when JS lib throws error.
-        }
-        return engine;
-    }
-
-    private void setPrintStreamToEngine(ScriptEngine jse, Printer printStream) throws ScriptException {
-        jse.put("__printStream", printStream);
-        jse.eval("Output = __printStream;");
-        jse.eval("__printStream = undefined;");
+    private ScriptContext createScriptContext() throws IOException, ScriptException {
+        File moduleDirectory = new File(
+                runtimeContext.getTemplateDirectory(),
+                EntityPathContext.EntityType.JavaScript.getDirectoryName()
+        );
+        EntityPathContext entityPathContext = new EntityPathContext(
+                runtimeContext,
+                EntityPathContext.EntityType.JavaScript,
+                EntityPathContext.EntityModule.Template,
+                moduleDirectory, "/"
+        );
+        return new ScriptContext(entityPathContext, runtimeContext);
     }
 
     // Nashorn engine would omit some content if read from a long stream.

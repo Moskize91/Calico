@@ -76,7 +76,7 @@ public class Router {
 	private PageService getPageServiceWithNormalizeTargetPath(String absolutePath) {
 		if (pageEntity.entityExist(absolutePath)) {
 			File targetPathTemplateFile = pageEntity.entityFile(absolutePath);String params = "";
-			return new PageService(resource, targetPathTemplateFile, routeDir, params);
+			return new PageService(runtimeContext, resource, targetPathTemplateFile, routeDir, params);
 		} else {
 			String extensionName = PathUtil.getExtensionName(absolutePath);
 			String pathCells[] = clearHeadTailSlash(absolutePath).split("/");
@@ -95,7 +95,7 @@ public class Router {
 		File templatePath = getTemplatePath(path, extensionName);
 		if (templatePath != null) {
 			String params = selectParamsFromPath(pathCells, endOfExistDirIndex + 1);
-			return new PageService(resource, templatePath, routeDir, params);
+			return new PageService(runtimeContext, resource, templatePath, routeDir, params);
 		}
 		return null;
 	}
