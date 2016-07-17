@@ -59,18 +59,16 @@ public class Main {
 
     private static RuntimeContext configureRuntimeContext() throws ScriptException {
         RuntimeContext runtimeContext = new RuntimeContext();
-        runtimeContext.setSystemEntityDirectory(new File(getHomePath(), "lang"));
+        runtimeContext.setSystemEntityDirectory(new File(getHomePath(), "system"));
 
-        File calicoDirectory = new File(System.getProperty("user.dir"));
         EntityPathContext entityPathContext = new EntityPathContext(
                 runtimeContext,
                 EntityPathContext.EntityType.JavaScript,
-                EntityPathContext.EntityModule.Library,
-                calicoDirectory, "/");
+                EntityPathContext.EntityModule.Template, "/");
         ScriptContext initScriptContext = new ScriptContext(
                 entityPathContext,
                 runtimeContext);
-        Object calicoInitialization = initScriptContext.require("/lang/calico_initialization");
+        Object calicoInitialization = initScriptContext.require("/system/calico_initialization");
         initScriptContext.engine().put("__calico_initialization", calicoInitialization);
 
         String head = "var __calico_configuration = new __calico_initialization.Configuration();" +

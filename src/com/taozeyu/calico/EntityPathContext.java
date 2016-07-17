@@ -18,13 +18,39 @@ public class EntityPathContext {
     private final String absolutionPath;
 
     public EntityPathContext(RuntimeContext runtimeContext,
-                             EntityType entityType, EntityModule entityModule,
-                             File moduleDirectory, String absolutionPath) {
+                             EntityType entityType,
+                             EntityModule entityModule,
+                             String absolutionPath) {
         this.runtimeContext = runtimeContext;
         this.entityType = entityType;
         this.entityModule = entityModule;
-        this.moduleDirectory = moduleDirectory;
         this.absolutionPath = absolutionPath;
+        this.moduleDirectory = getModuleDirectory(runtimeContext,
+                                                  entityType,
+                                                  entityModule);
+    }
+
+    private EntityPathContext(EntityPathContext parentContext,
+                              String absolutionPath) {
+        this.runtimeContext = parentContext.runtimeContext;
+        this.entityType = parentContext.entityType;
+        this.entityModule = parentContext.entityModule;
+        this.moduleDirectory = parentContext.moduleDirectory;
+        this.absolutionPath = absolutionPath;
+    }
+
+    private File getModuleDirectory(RuntimeContext runtimeContext,
+                                    EntityType entityType,
+                                    EntityModule entityModule) {
+        File routerDirectory = null;
+        if (entityModule == EntityModule.SystemLibrary) {
+            routerDirectory = runtimeContext.getSystemEntityDirectory();
+        } else if (entityModule == EntityModule.Library) {
+            //TODO not implements
+        } else if (entityModule == EntityModule.Template) {
+            routerDirectory = runtimeContext.getTemplateDirectory();
+        }
+        return new File(routerDirectory, entityType.getDirectoryName());
     }
 
     @Override
@@ -114,26 +140,22 @@ public class EntityPathContext {
             return this;
         }
         if (existDirectory(absolutePath, entityModule, moduleDirectory)) {
-            return new EntityPathContext(runtimeContext,
-                                         entityType, entityModule,
-                                         moduleDirectory, absolutePath);
+            return new EntityPathContext(this, absolutePath);
         }
         String[] components = PathUtil.splitComponents(absolutePath);
         if (components.length == 0) {
             return null;
         }
         String moduleName = components[0];
-        File moduleDirectory = null;
         EntityModule module = null;
 
-        if (moduleName.equals("lang") &&
-            (EntityModule.Template == entityModule ||
-            EntityModule.Library == entityModule)) {
-            moduleDirectory = runtimeContext.getSystemEntityDirectory();
+        if (moduleName.equals("system") &&
+           (EntityModule.Template == entityModule ||
+            EntityModule.Library == entityModule)
+        ) {
             module = EntityModule.SystemLibrary;
-        } else if (!moduleName.equals("lang") &&
+        } else if (!moduleName.equals("system") &&
                     EntityModule.Template == entityModule) {
-            moduleDirectory = runtimeContext.getLibrerayDirectoryMap().get(moduleName);
             module = EntityModule.Library;
         }
         if (moduleDirectory == null) {
@@ -142,9 +164,8 @@ public class EntityPathContext {
         components = Arrays.copyOfRange(components, 0, components.length - 1);
         boolean isRoot = true;
         absolutePath = PathUtil.pathFromComponents(components, isRoot);
-        return new EntityPathContext(runtimeContext,
-                                     entityType, module,
-                                     moduleDirectory, absolutePath);
+        return new EntityPathContext(runtimeContext, entityType,
+                                     module, absolutePath);
     }
 
     private String getPathByThisContext(String path) {

@@ -46,15 +46,10 @@ public class PageService {
     }
 
     private ScriptContext createScriptContext() throws IOException, ScriptException {
-        File moduleDirectory = new File(
-                runtimeContext.getTemplateDirectory(),
-                EntityPathContext.EntityType.JavaScript.getDirectoryName()
-        );
         EntityPathContext entityPathContext = new EntityPathContext(
                 runtimeContext,
                 EntityPathContext.EntityType.JavaScript,
-                EntityPathContext.EntityModule.Template,
-                moduleDirectory, "/"
+                EntityPathContext.EntityModule.Template, "/"
         );
         return new ScriptContext(entityPathContext, runtimeContext);
     }

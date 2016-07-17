@@ -26,25 +26,15 @@ public class Router {
 		this.resource = resource;
 		this.routeDir = runtimeContext.getTemplateDirectory();
 
-		File assetEntityModule = new File(
-				runtimeContext.getTemplateDirectory(),
-				EntityPathContext.EntityType.Asset.getDirectoryName()
-		);
-		File pageEntityModule = new File(
-				runtimeContext.getTemplateDirectory(),
-				EntityPathContext.EntityType.Page.getDirectoryName()
-		);
 		this.assetEntity = new EntityPathContext(
 				runtimeContext,
 				EntityPathContext.EntityType.Asset,
-				EntityPathContext.EntityModule.Template,
-				assetEntityModule, "/"
+				EntityPathContext.EntityModule.Template, "/"
 		);
 		this.pageEntity = new EntityPathContext(
 				runtimeContext,
 				EntityPathContext.EntityType.Page,
-				EntityPathContext.EntityModule.Template,
-				pageEntityModule, "/"
+				EntityPathContext.EntityModule.Template, "/"
 		);
 	}
 
