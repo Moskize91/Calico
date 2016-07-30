@@ -2,6 +2,7 @@ package com.taozeyu.calico;
 
 import java.io.File;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by taozeyu on 16/7/10.
@@ -11,10 +12,12 @@ public class RuntimeContext {
     private int port;
     private File templateDirectory;
     private File targetDirectory;
-    private File resourceDirecotry;
+    private File resourceDirectory;
     private File systemEntityDirectory;
     private String rootPage;
-    private Map<String, File> librerayDirectoryMap;
+    private Pattern ignoreCopy;
+    private Pattern ignoreClean;
+    private Map<String, File> libraryDirectoryMap;
 
     public int getPort() {
         return port;
@@ -40,12 +43,12 @@ public class RuntimeContext {
         this.targetDirectory = targetDirectory;
     }
 
-    public File getResourceDirecotry() {
-        return resourceDirecotry;
+    public File getResourceDirectory() {
+        return resourceDirectory;
     }
 
-    public void setResourceDirecotry(File resourceDirecotry) {
-        this.resourceDirecotry = resourceDirecotry;
+    public void setResourceDirectory(File resourceDirectory) {
+        this.resourceDirectory = resourceDirectory;
     }
 
     public File getSystemEntityDirectory() {
@@ -64,11 +67,27 @@ public class RuntimeContext {
         this.rootPage = rootPage;
     }
 
-    public Map<String, File> getLibrerayDirectoryMap() {
-        return librerayDirectoryMap;
+    public Map<String, File> getLibraryDirectoryMap() {
+        return libraryDirectoryMap;
     }
 
-    public void setLibrerayDirectoryMap(Map<String, File> librerayDirectoryMap) {
-        this.librerayDirectoryMap = librerayDirectoryMap;
+    public void setLibraryDirectoryMap(Map<String, File> libraryDirectoryMap) {
+        this.libraryDirectoryMap = libraryDirectoryMap;
+    }
+
+    public Pattern getIgnoreCopy() {
+        return ignoreCopy;
+    }
+
+    public void setIgnoreCopy(Pattern ignoreCopy) {
+        this.ignoreCopy = ignoreCopy;
+    }
+
+    public Pattern getIgnoreClean() {
+        return ignoreClean;
+    }
+
+    public void setIgnoreClean(Pattern ignoreClean) {
+        this.ignoreClean = ignoreClean;
     }
 }

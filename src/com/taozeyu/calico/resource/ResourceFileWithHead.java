@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.taozeyu.calico.GlobalConfig;
-
 public class ResourceFileWithHead {
 
 	private static final Pattern HeadLinePattern = Pattern.compile("^(\\w|\\-)+\\s*:\\s*.+\\s*$");

@@ -1,6 +1,6 @@
 package com.taozeyu.calico.copier;
 
-import com.taozeyu.calico.GlobalConfig;
+import com.taozeyu.calico.RuntimeContext;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -13,11 +13,13 @@ public class TargetDirectoryCleaner {
     private static String[] ArtResourceExtendionNames = new String[] {
             "jpge", "jpg", "png", "gif"
     };
-    private final Pattern ignoreCopyPattern = GlobalConfig.instance().getPattern("ignore-copy");
-    private final Pattern ignoreCleanPattern = GlobalConfig.instance().getPattern("ignore-clean", ".*\\.git.*");
+    private final Pattern ignoreCopyPattern;
+    private final Pattern ignoreCleanPattern;
     private File targetPath;
 
-    public TargetDirectoryCleaner(File targetPath) {
+    public TargetDirectoryCleaner(RuntimeContext runtimeContext, File targetPath) {
+        this.ignoreCopyPattern = runtimeContext.getIgnoreCopy();
+        this.ignoreCleanPattern = runtimeContext.getIgnoreClean();
         this.targetPath = targetPath;
     }
 

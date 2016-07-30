@@ -1,12 +1,12 @@
 package com.taozeyu.calico.generator;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.script.ScriptException;
 
-import com.taozeyu.calico.GlobalConfig;
 import com.taozeyu.calico.util.PrintStreamAdapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,9 +34,7 @@ public class FileGenerator {
 
 		boolean autoFlush = false;
 		PrintStreamAdapter printStream = new PrintStreamAdapter(
-				getTargetFileOutputStream(targetDir), autoFlush,
-				GlobalConfig.instance().getCharset().name());
-
+				getTargetFileOutputStream(targetDir), autoFlush, "UTF-8");
 		try {
 			pageService.requestPage(printStream);
 
@@ -72,7 +70,6 @@ public class FileGenerator {
 
 	private Document getDocumentFromTargetFile(File targetDir) throws IOException {
 		File targetFile = getTargetFile(targetDir);
-		String charsetName = GlobalConfig.instance().getCharset().name();
-		return Jsoup.parse(targetFile, charsetName);
+		return Jsoup.parse(targetFile, "UTF-8");
 	}
 }

@@ -29,7 +29,7 @@ public class Main {
         }
         RuntimeContext runtimeContext = configureRuntimeContext();
 
-		ResourceManager resource = new ResourceManager(runtimeContext.getResourceDirecotry());
+		ResourceManager resource = new ResourceManager(runtimeContext.getResourceDirectory());
 		Router router = new Router(runtimeContext, resource);
 
 		String command = argumentsHandler.getCommand();
@@ -96,7 +96,7 @@ public class Main {
 
         runtimeContext.setTemplateDirectory(getDirectoryWithPath(templateDirectory));
         runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
-        runtimeContext.setResourceDirecotry(getDirectoryWithPath(resourceDirectory));
+        runtimeContext.setResourceDirectory(getDirectoryWithPath(resourceDirectory));
         runtimeContext.setRootPage(rootPage);
         runtimeContext.setPort(port);
 
@@ -129,11 +129,11 @@ public class Main {
         return path;
     }
 
-	private static void build(Router router, File targetPath, File templatePath)
+	private static void build(RuntimeContext runtimeContext, Router router, File targetPath, File templatePath)
 			throws IOException, ScriptException {
 
-		new TargetDirectoryCleaner(targetPath).clean();
-		new ResourceFileCopier(templatePath, targetPath).copy();
+		new TargetDirectoryCleaner(runtimeContext, targetPath).clean();
+		new ResourceFileCopier(runtimeContext, templatePath, targetPath).copy();
 		new ContentBuilder(router, targetPath).buildFromRootFile();
 	}
 

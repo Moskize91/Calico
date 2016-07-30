@@ -1,6 +1,6 @@
 package com.taozeyu.calico.copier;
 
-import com.taozeyu.calico.GlobalConfig;
+import com.taozeyu.calico.RuntimeContext;
 
 import java.io.*;
 import java.util.regex.Pattern;
@@ -10,12 +10,13 @@ import java.util.regex.Pattern;
  */
 public class ResourceFileCopier {
 
-    private final Pattern ignorePattern = GlobalConfig.instance().getPattern("ignore-copy");
+    private final Pattern ignorePattern;
 
     private File templateDir;
     private File targetDir;
 
-    public ResourceFileCopier(File templateDir, File targetDir) {
+    public ResourceFileCopier(RuntimeContext runtimeContext, File templateDir, File targetDir) {
+        this.ignorePattern = runtimeContext.getIgnoreCopy();
         this.templateDir = templateDir;
         this.targetDir = targetDir;
     }
