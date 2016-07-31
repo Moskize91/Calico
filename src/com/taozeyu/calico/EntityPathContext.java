@@ -79,7 +79,8 @@ public class EntityPathContext {
             ClassLoader loader = getClass().getClassLoader();
             return loader.getResource(path) != null;
         } else {
-            File file = new File(context.moduleDirectory, fileName);
+            File pathRelativeModuleDirectory = new File(context.absolutionPath, fileName);
+            File file = new File(context.moduleDirectory, pathRelativeModuleDirectory.getPath());
             return file.exists() && file.isFile();
         }
     }
@@ -109,7 +110,8 @@ public class EntityPathContext {
             ClassLoader loader = getClass().getClassLoader();
             return loader.getResourceAsStream(path);
         } else {
-            File file = new File(context.moduleDirectory, fileName);
+            File pathRelativeModuleDirectory = new File(context.absolutionPath, fileName);
+            File file = new File(context.moduleDirectory, pathRelativeModuleDirectory.getPath());
             try {
                 return new FileInputStream(file);
             } catch (FileNotFoundException e) {
@@ -148,20 +150,27 @@ public class EntityPathContext {
         }
         String moduleName = components[0];
         EntityModule module = null;
+        File targetModuleDirectory = null;
 
         if (moduleName.equals("system") &&
            (EntityModule.Template == entityModule ||
             EntityModule.Library == entityModule)
         ) {
             module = EntityModule.SystemLibrary;
+            targetModuleDirectory = runtimeContext.getSystemEntityDirectory();
         } else if (!moduleName.equals("system") &&
                     EntityModule.Template == entityModule) {
-            module = EntityModule.Library;
+            module = EntityModule.Template;
+            targetModuleDirectory = runtimeContext.getTemplateDirectory();
         }
         if (moduleDirectory == null) {
             return null;
         }
-        components = Arrays.copyOfRange(components, 0, components.length - 1);
+        if (existDirectory(absolutePath, entityModule, targetModuleDirectory)) {
+            components = Arrays.copyOfRange(components, 0, components.length);
+        } else {
+            components = Arrays.copyOfRange(components, 0, components.length - 1);
+        }
         boolean isRoot = true;
         absolutePath = PathUtil.pathFromComponents(components, isRoot);
         return new EntityPathContext(runtimeContext, entityType,
