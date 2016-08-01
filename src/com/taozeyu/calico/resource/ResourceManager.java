@@ -27,6 +27,16 @@ public class ResourceManager {
 		this.rootResourceManager = rootResourceManager;
 	}
 
+	public String path() {
+		return sourceDir.getPath();
+	}
+
+	public String name() {
+		String path = PathUtil.normalizePath(path());
+		int nameStartIndex = path.lastIndexOf('/') + 1;
+		return path.substring(nameStartIndex);
+	}
+
 	public AbstractResource getResource(String path) {
 		File pageFile = getPageFile(path);
 		if(pageFile == null) {

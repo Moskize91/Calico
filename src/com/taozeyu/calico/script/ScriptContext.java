@@ -49,6 +49,7 @@ public class ScriptContext {
         this.engine.getContext().setWriter(new OutputStreamWriter(System.out, LibraryCharset));
         this.engine.getContext().setErrorWriter(new OutputStreamWriter(System.err, LibraryCharset));
         this.engine.put("__script_context", this);
+        this.engine.put("SystemOut", System.out);
         this.engine.eval("function __require(path) { return __script_context.require(path); };");
     }
 

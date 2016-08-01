@@ -4,6 +4,9 @@ var wrap = function(resource) {
 
     var R = {};
 
+    R.path = resource.path();
+    R.name = resource.name();
+
     R.config = function(path) {
         var jsonResource = resource.getResource(path);
         if (jsonResource) {
