@@ -11,6 +11,7 @@ import javax.script.ScriptException;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -19,6 +20,8 @@ import java.util.Map;
 public class ScriptContext {
 
     private static final Charset LibraryCharset = Charset.forName("UTF-8");
+    private static final LinkedList<EntityPathContext.ContextResult> contextResultStack = new LinkedList<>();
+
     private final ScriptContext rootScriptContext;
     private final ScriptEngine engine;
     private final EntityPathContext entityPathContext;
@@ -68,18 +71,30 @@ public class ScriptContext {
                 throw new ScriptException("require not found `" + originalPath + "`");
             }
         }
-
         EntityPathContext.ContextResult result = entityPathContext.findFileAndParentContext(path);
-        Object requiredObject = rootScriptContext.requiredCache.get(result);
-
-        if (requiredObject == null) {
-            ScriptContext subcontext = new ScriptContext(rootScriptContext,
-                    result.getContext(),
-                    runtimeContext);
-            InputStream inputStream = entityPathContext.inputStreamOfFile(path + ".js");
-            requiredObject = subcontext.loadScriptFile(inputStream);
-            rootScriptContext.requiredCache.put(result, requiredObject);
+        if (contextResultStack.contains(result)) {
+            LinkedList<String> linkNames = new LinkedList<>();
+            for (EntityPathContext.ContextResult cr : contextResultStack) {
+                linkNames.push("`"+ PathUtil.clearExtensionName(cr.getFileName()) +"`");
+            }
+            linkNames.push("`"+ PathUtil.clearExtensionName(result.getFileName()) +"`");
+            throw new ScriptException("circular dependencies "+ String.join(" -> ", linkNames));
         }
+        contextResultStack.push(result);
+        Object requiredObject = rootScriptContext.requiredCache.get(result);
+        try {
+            if (requiredObject == null) {
+                ScriptContext subcontext = new ScriptContext(rootScriptContext,
+                        result.getContext(),
+                        runtimeContext);
+                InputStream inputStream = entityPathContext.inputStreamOfFile(path + ".js");
+                requiredObject = subcontext.loadScriptFile(inputStream);
+                rootScriptContext.requiredCache.put(result, requiredObject);
+            }
+        } finally {
+            contextResultStack.pop();
+        }
+
         return requiredObject;
     }
 
