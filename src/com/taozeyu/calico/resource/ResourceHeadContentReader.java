@@ -29,13 +29,19 @@ class ResourceHeadContentReader {
 		this.contentBuilder = new StringBuilder();
 	}
 	
-	void read() throws IOException {
+	Character read() throws IOException {
+		Character resultChar = null;
 		for(int ch = reader.read(); ch > 0; ch = reader.read()) {
 			boolean finish = readOneCharAndCheckIsFinish((char) ch);
 			if(finish) {
-				//contentBuilder 会缓存末尾额外的 '---'，这是多余的，因此必须删掉。
-				content = subStringLast3Char(contentBuilder.toString());
-				return;
+				if (state == State.Init) {
+					// 文件中没有 '---',因此第一个字符必须被保留下来。
+					resultChar = (char) ch;
+				} else {
+					//contentBuilder 会缓存末尾额外的 '---'，这是多余的，因此必须删掉。
+					content = subStringLast3Char(contentBuilder.toString());
+				}
+				return resultChar;
 			}
 		}
 		if(!isReadingContinuousBarSign()) {
@@ -44,6 +50,7 @@ class ResourceHeadContentReader {
 			 * 3、如果读到两个 '---'（ Head被这两个 '---' 包含起来），则通过 finish == true 然后 return 了。此时流程不会走到这一步。 */
 			throw new ResourceException("resource file missing '---' at the end. "+ resourceName);
 		}
+		return resultChar;
 	}
 
 	private String subStringLast3Char(String str) {
@@ -77,7 +84,7 @@ class ResourceHeadContentReader {
 			handleWhenIsHeadContent(ch);
 			break;
 		}
-		contentBuilder.append((char) ch);
+		contentBuilder.append(ch);
 		
 		return finishReadMark;
 	}

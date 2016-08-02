@@ -31,14 +31,14 @@ public class ResourceFileWithHead {
 
 	public Reader createResourceFileReaderByJumpOverHead() throws IOException {
 		Reader reader = createResourceFileReader();
-		jumpOverHead(reader);
+		ResourceHeadContentReader headContentReader = new ResourceHeadContentReader(reader, resourceFile.getPath());
+		Character firstChar = headContentReader.read();
+		if (firstChar != null) {
+			reader = new ReaderWithOneChar(reader, firstChar);
+		}
 		return reader;
 	}
 
-	private void jumpOverHead(Reader reader) throws IOException {
-		new ResourceHeadContentReader(reader, resourceFile.getPath()).read();
-	}
-	
 	public File getResourceFile() {
 		return resourceFile;
 	}
