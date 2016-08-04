@@ -101,9 +101,10 @@ public class ScriptContext {
 
     public Object loadScriptFile(InputStream inputStream) throws ScriptException {
         String head = "var __require_module = {};\n" +
-                      "(function(require, M) {" +
+                      "var __result = (function(require, M) {" +
                       "var __require_module = undefined;\n";
         String footer = "\n}) (__require, __require_module);\n" +
+                        "if (__result !== undefined && __result !== null) { __require_module = __result } \n" +
                         "__require_module;";
         return loadScriptFile(inputStream, head, footer);
     }
