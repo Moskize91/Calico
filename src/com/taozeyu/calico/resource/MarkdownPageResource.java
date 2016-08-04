@@ -12,7 +12,7 @@ import com.taozeyu.calico.util.EscapeHelper;
 
 public class MarkdownPageResource extends AbstractPageResource {
 
-	private static final MarkdownProcessor MarkdwonProcessor = new MarkdownProcessor();
+	private static final MarkdownProcessor MarkdownProcessor = new MarkdownProcessor();
 	
 	MarkdownPageResource(File resourceFile, String resourcePath) {
 		super(resourceFile, resourcePath);
@@ -24,7 +24,7 @@ public class MarkdownPageResource extends AbstractPageResource {
 			String content = getStringFromReader(reader);
 			CodeBlockContainer codeBlockContainer = new CodeBlockContainer();
 			content = codeBlockContainer.pares(content);
-			content = MarkdwonProcessor.markdown(content);
+			content = MarkdownProcessor.markdown(content);
 			content = codeBlockContainer.replaceHolderWithCodeBlock(content);
 			return content;
 		}
