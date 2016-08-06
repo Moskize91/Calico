@@ -45,6 +45,11 @@ public class Router {
 
 	public FileGenerator getFileGenerator(String absolutePath) {
 
+		PageService pageService = getPageService(absolutePath);
+
+		if (pageService == null) {
+			throw new RouteException("No template file map to '" + absolutePath + "'.");
+		}
 		String targetPath = PathUtil.normalizePathAndCleanExtensionName(absolutePath);
 		boolean isRootPage = false;
 
@@ -52,14 +57,13 @@ public class Router {
 			targetPath = runtimeContext.getRootPage();
 			isRootPage = true;
 		}
-		PageService pageService = getPageServiceWithNormalizeTargetPath(targetPath);
-		if (pageService == null) {
-			throw new RouteException("No template file map to '"+ absolutePath +"'.");
-		}
 		return new FileGenerator(pageService, new File(targetPath), isRootPage);
 	}
 
 	public PageService getPageService(String absolutePath) {
+		if (runtimeContext.getRedirectMap().containsKey(absolutePath)) {
+			return getPageService(runtimeContext.getRedirectMap().get(absolutePath));
+		}
 		String targetPath = PathUtil.normalizePathAndCleanExtensionName(absolutePath);
 		if(targetPath.equals(RootPath)) {
 			targetPath = runtimeContext.getRootPage();

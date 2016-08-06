@@ -7,9 +7,11 @@ exports.Configuration = function() {
         target_directory            : "./target",
         resource_directory          : "./",
         root_page                   : "/index.html",
+        seeds                       : ["/"],
         linked_resource_assets_path : "[]",
         ignore_copy                 : /$^/,
         ignore_clean                : /.*\.git\/.*/,
+        redirect                    : {},
     };
 };
 
@@ -25,6 +27,10 @@ exports.Configuration.prototype.value_of_array = function(name) {
         return null;
     }
     return Java.to(this.configure[name], Java.type("java.lang.String[]"));
+};
+
+exports.Configuration.prototype.value_of_map = function(name) {
+    return this.configure[name];
 };
 
 exports.Configuration.prototype.value_of_pattern = function(name) {

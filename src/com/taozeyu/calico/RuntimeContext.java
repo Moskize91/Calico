@@ -15,9 +15,11 @@ public class RuntimeContext {
     private File resourceDirectory;
     private File systemEntityDirectory;
     private String rootPage;
+    private String[] seeds;
     private String[] resourceAssetsPath;
     private Pattern ignoreCopy;
     private Pattern ignoreClean;
+    private Map<String, String> redirectMap;
     private Map<String, File> libraryDirectoryMap;
 
     public int getPort() {
@@ -68,6 +70,14 @@ public class RuntimeContext {
         this.rootPage = rootPage;
     }
 
+    public String[] getSeeds() {
+        return seeds;
+    }
+
+    public void setSeeds(String[] seeds) {
+        this.seeds = seeds;
+    }
+
     public String[] getResourceAssetsPath() {
         return resourceAssetsPath;
     }
@@ -90,6 +100,14 @@ public class RuntimeContext {
 
     public void setIgnoreClean(Pattern ignoreClean) {
         this.ignoreClean = ignoreClean;
+    }
+
+    public Map<String, String> getRedirectMap() {
+        return redirectMap;
+    }
+
+    public void setRedirectMap(Map<String, String> redirectMap) {
+        this.redirectMap = redirectMap;
     }
 
     public Map<String, File> getLibraryDirectoryMap() {

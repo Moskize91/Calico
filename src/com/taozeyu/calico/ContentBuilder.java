@@ -18,7 +18,8 @@ import com.taozeyu.calico.util.PathUtil;
 class ContentBuilder {
 
 	private static final Pattern UrlWithDomain = Pattern.compile("^(http|https)://(\\w|\\-)+(\\.(\\w+|\\-))*(:\\d+)?");
-	
+
+	private final RuntimeContext runtimeContext;
 	private final Router router;
 	private final File targetDir;
 	
@@ -26,14 +27,17 @@ class ContentBuilder {
 	private final Set<String> handledPathSet = new HashSet<String>();
 	
 	ContentBuilder(RuntimeContext runtimeContext, Router router) {
+		this.runtimeContext = runtimeContext;
 		this.router = router;
 		this.targetDir = runtimeContext.getTargetDirectory();
 	}
 	
-	void buildFromRootFile() throws IOException, ScriptException {
+	void buildWithSeeds() throws IOException, ScriptException {
 		System.out.println("");
 		System.out.println("Generate html pages.");
-		findPathAndTryAddToQueue(Router.RootPath);
+		for (String seed : runtimeContext.getSeeds()) {
+			findPathAndTryAddToQueue(seed);
+		}
 		while(!isQueueEmpty()) {
 			String path = getPathFromQueue();
 			System.out.println("\tgenerate path "+ path);

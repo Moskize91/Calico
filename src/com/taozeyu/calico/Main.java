@@ -2,6 +2,7 @@ package com.taozeyu.calico;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.taozeyu.calico.copier.ResourceFileCopier;
@@ -11,7 +12,6 @@ import com.taozeyu.calico.resource.ResourceManager;
 import com.taozeyu.calico.script.ScriptContext;
 import com.taozeyu.calico.util.PathUtil;
 import com.taozeyu.calico.web_services.WebService;
-import jdk.nashorn.api.scripting.ScriptUtils;
 
 import javax.script.ScriptException;
 
@@ -93,6 +93,8 @@ public class Main {
                 .eval("__calico_configuration.value_of_string('resource_directory')");
         String rootPage = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('root_page')");
+        String[] seeds = (String[]) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_array('seeds')");
         String[] resourceAssetsPath = (String[]) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_array('linked_resource_assets_path')");
         int port = (int) ((Double) initScriptContext.engine()
@@ -102,16 +104,20 @@ public class Main {
                 .eval("__calico_configuration.value_of_pattern('ignore_copy')");
         String ignoreClean = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_pattern('ignore_clean')");
+        Map<String, String> redirectMap = (Map<String, String>) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_map('redirect')");
 
         runtimeContext.setTemplateDirectory(getDirectoryWithPath(templateDirectory));
         runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
         runtimeContext.setResourceDirectory(getDirectoryWithPath(resourceDirectory));
         runtimeContext.setRootPage(rootPage);
+        runtimeContext.setSeeds(seeds);
         runtimeContext.setResourceAssetsPath(resourceAssetsPath);
         runtimeContext.setPort(port);
 
         runtimeContext.setIgnoreClean(Pattern.compile(ignoreClean));
         runtimeContext.setIgnoreCopy(Pattern.compile(ignoreCopy));
+        runtimeContext.setRedirectMap(redirectMap);
 
         return runtimeContext;
     }
@@ -147,7 +153,7 @@ public class Main {
 
 		new TargetDirectoryCleaner(runtimeContext).clean();
 		new ResourceFileCopier(runtimeContext).copy();
-		new ContentBuilder(runtimeContext, router).buildFromRootFile();
+		new ContentBuilder(runtimeContext, router).buildWithSeeds();
 	}
 
 	private static void waitForCtrlCHook(Runnable whenShutdown) throws InterruptedException {
