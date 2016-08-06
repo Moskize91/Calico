@@ -10,7 +10,7 @@ Parameters.prototype.pick = function(format) {
     var result = {};
     format = format.replace(/(^\/|\/$)/g, "");
     var format_components = format.split("/");
-    for (var i = 0; i < format_components.length; i++) {
+    for (var i = 0; i < format_components.length && i < this._components.length; i++) {
         var format_component = format_components[i];
         var param_component = this._components[i];
         if (format_component.startsWith(":")) {
