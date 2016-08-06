@@ -138,8 +138,8 @@ public class MarkdownPageResource extends AbstractPageResource {
 				content = content.replaceAll("(\\s|\\n)+", " ").trim();
 			}
 			content = EscapeHelper.escape(content);
-			String head = preTag? "<div class='highlight'><code><pre>": "<span class='highlight'><code>";
-			String rear = preTag? "</pre></code></div>": "</span></code>";
+			String head = preTag? "<pre><div class='highlight'><code>": "<span class='highlight'><code>";
+			String rear = preTag? "</code></div></pre>": "</span></code>";
 			return head + content + rear;
 		}
 	}
