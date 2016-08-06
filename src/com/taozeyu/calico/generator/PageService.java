@@ -45,7 +45,10 @@ public class PageService {
                 put("session", scriptContext.engine().eval(
                         "new (__require('/system/session').Session)();"
                 ));
-                put("params", params);
+                put("params", callJavaScript(
+                        scriptContext, params, "__parameters",
+                        "new (__require('/system/parameters').Parameters)(__parameters)"
+                ));
                 put("template", pageAbsolutionPath);
             }});
         } catch (ScriptException e) {

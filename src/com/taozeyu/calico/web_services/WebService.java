@@ -109,10 +109,6 @@ public class WebService extends NanoHTTPD {
         return new Response(OK, contentType, is);
     }
 
-    private boolean isFile(File file) {
-        return file.exists() && file.isFile();
-    }
-
     private Response getErrorMessageResponse(Response.IStatus state, String errorMessage) {
         String contentType = "text/html";
         System.err.println(errorMessage);
