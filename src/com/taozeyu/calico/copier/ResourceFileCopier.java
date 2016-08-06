@@ -4,6 +4,7 @@ import com.taozeyu.calico.EntityPathContext;
 import com.taozeyu.calico.RuntimeContext;
 
 import java.io.*;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -11,35 +12,40 @@ import java.util.regex.Pattern;
  */
 public class ResourceFileCopier {
 
+    private final RuntimeContext runtimeContext;
     private final Pattern ignorePattern;
 
-    private File templateDir;
-    private File targetDir;
-
     public ResourceFileCopier(RuntimeContext runtimeContext) {
+        this.runtimeContext = runtimeContext;
         this.ignorePattern = runtimeContext.getIgnoreCopy();
-        this.templateDir = new File(
-                runtimeContext.getTemplateDirectory(),
-                EntityPathContext.EntityType.Asset.getDirectoryName());
-        this.targetDir = runtimeContext.getTargetDirectory();
     }
 
     public void copy() throws IOException {
         System.out.println("");
         System.out.println("Copy resource files");
-        copyAllFile("");
+
+        copyAllFile(new File(
+                runtimeContext.getTemplateDirectory(),
+                EntityPathContext.EntityType.Asset.getDirectoryName()));
+        for (String resourceAssetsPath : runtimeContext.getResourceAssetsPath()) {
+            copyAllFile(runtimeContext.getResourceDirectory(), resourceAssetsPath);
+        }
     }
 
-    private void copyAllFile(String relativePath) throws IOException {
-        File templateFile = new File(templateDir, relativePath);
-        if (templateFile.isDirectory()) {
-            for (String childFileName : templateFile.list()) {
-                copyAllFile(relativePath +"/"+ childFileName);
+    private void copyAllFile(File searchRootDir) throws IOException {
+        copyAllFile(searchRootDir, "");
+    }
+
+    private void copyAllFile(File searchRootDir, String relativePath) throws IOException {
+        File searchFile = new File(searchRootDir, relativePath);
+        if (searchFile.isDirectory()) {
+            for (String childFileName : searchFile.list()) {
+                copyAllFile(searchRootDir, relativePath +"/"+ childFileName);
             }
         } else {
-            if (fileSouldBeCopied(templateFile)) {
+            if (fileSouldBeCopied(searchFile)) {
                 System.out.println("copy file " + relativePath);
-                copyFile(templateFile, new File(targetDir, relativePath));
+                copyFile(searchFile, new File(runtimeContext.getTargetDirectory(), relativePath));
             }
         }
     }
