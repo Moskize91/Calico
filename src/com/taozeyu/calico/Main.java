@@ -2,6 +2,7 @@ package com.taozeyu.calico;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import com.taozeyu.calico.copier.ResourceFileCopier;
 import com.taozeyu.calico.copier.TargetDirectoryCleaner;
@@ -36,7 +37,7 @@ public class Main {
 		String command = argumentsHandler.getCommand();
 
 		if (command.toLowerCase().equals("build")) {
-//			build(router, targetPath, templatePath);
+			build(runtimeContext, router);
 
 		} else if (command.toLowerCase().equals("service")) {
 			service(runtimeContext, router);
@@ -97,12 +98,20 @@ public class Main {
         int port = (int) ((Double) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_integer('port')")).doubleValue();
 
+        String ignoreCopy = (String) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_pattern('ignore_copy')");
+        String ignoreClean = (String) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_pattern('ignore_clean')");
+
         runtimeContext.setTemplateDirectory(getDirectoryWithPath(templateDirectory));
         runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
         runtimeContext.setResourceDirectory(getDirectoryWithPath(resourceDirectory));
         runtimeContext.setRootPage(rootPage);
         runtimeContext.setResourceAssetsPath(resourceAssetsPath);
         runtimeContext.setPort(port);
+
+        runtimeContext.setIgnoreClean(Pattern.compile(ignoreClean));
+        runtimeContext.setIgnoreCopy(Pattern.compile(ignoreCopy));
 
         return runtimeContext;
     }
@@ -133,12 +142,12 @@ public class Main {
         return path;
     }
 
-	private static void build(RuntimeContext runtimeContext, Router router, File targetPath, File templatePath)
+	private static void build(RuntimeContext runtimeContext, Router router)
 			throws IOException, ScriptException {
 
-		new TargetDirectoryCleaner(runtimeContext, targetPath).clean();
-		new ResourceFileCopier(runtimeContext, templatePath, targetPath).copy();
-		new ContentBuilder(router, targetPath).buildFromRootFile();
+		new TargetDirectoryCleaner(runtimeContext).clean();
+		new ResourceFileCopier(runtimeContext).copy();
+		new ContentBuilder(runtimeContext, router).buildFromRootFile();
 	}
 
 	private static void waitForCtrlCHook(Runnable whenShutdown) throws InterruptedException {

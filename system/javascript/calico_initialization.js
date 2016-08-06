@@ -8,6 +8,8 @@ exports.Configuration = function() {
         resource_directory          : "./",
         root_page                   : "/index.html",
         linked_resource_assets_path : "[]",
+        ignore_copy                 : /$^/,
+        ignore_clean                : /.*\.git\/.*/,
     };
 };
 
@@ -24,6 +26,13 @@ exports.Configuration.prototype.value_of_array = function(name) {
     }
     return Java.to(this.configure[name], Java.type("java.lang.String[]"));
 };
+
+exports.Configuration.prototype.value_of_pattern = function(name) {
+    if (!this.configure[name]) {
+        return null;
+    }
+    return ("" + this.configure[name]).replace(/(^\/|\/$)/g, "");
+}
 
 exports.Configuration.prototype.value_of_integer = function(name) {
     if (!this.configure[name]) {

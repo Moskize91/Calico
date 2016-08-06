@@ -1,5 +1,6 @@
 package com.taozeyu.calico.copier;
 
+import com.taozeyu.calico.EntityPathContext;
 import com.taozeyu.calico.RuntimeContext;
 
 import java.io.*;
@@ -15,10 +16,12 @@ public class ResourceFileCopier {
     private File templateDir;
     private File targetDir;
 
-    public ResourceFileCopier(RuntimeContext runtimeContext, File templateDir, File targetDir) {
+    public ResourceFileCopier(RuntimeContext runtimeContext) {
         this.ignorePattern = runtimeContext.getIgnoreCopy();
-        this.templateDir = templateDir;
-        this.targetDir = targetDir;
+        this.templateDir = new File(
+                runtimeContext.getTemplateDirectory(),
+                EntityPathContext.EntityType.Asset.getDirectoryName());
+        this.targetDir = runtimeContext.getTargetDirectory();
     }
 
     public void copy() throws IOException {

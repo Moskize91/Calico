@@ -10,20 +10,21 @@ import java.util.regex.Pattern;
  */
 public class TargetDirectoryCleaner {
 
-    private static String[] ArtResourceExtendionNames = new String[] {
+    private static String[] artResourceExtensionNames = new String[] {
             "jpge", "jpg", "png", "gif"
     };
+    private final RuntimeContext runtimeContext;
     private final Pattern ignoreCopyPattern;
     private final Pattern ignoreCleanPattern;
-    private File targetPath;
 
-    public TargetDirectoryCleaner(RuntimeContext runtimeContext, File targetPath) {
+    public TargetDirectoryCleaner(RuntimeContext runtimeContext) {
+        this.runtimeContext = runtimeContext;
         this.ignoreCopyPattern = runtimeContext.getIgnoreCopy();
         this.ignoreCleanPattern = runtimeContext.getIgnoreClean();
-        this.targetPath = targetPath;
     }
 
     public void clean() {
+        File targetPath = runtimeContext.getTargetDirectory();
         System.out.println("");
         System.out.println("Clean target directory: " + targetPath);
         cleanDirectory(targetPath);
@@ -54,7 +55,7 @@ public class TargetDirectoryCleaner {
     }
 
     private boolean isArtResourceFile(File file) {
-        for (String ext : ArtResourceExtendionNames) {
+        for (String ext : artResourceExtensionNames) {
             if (file.getName().matches(".*\\."+ ext +"$")) {
                 return true;
             }

@@ -25,9 +25,9 @@ class ContentBuilder {
 	private final Queue<String> pathQueue = new LinkedList<String>();
 	private final Set<String> handledPathSet = new HashSet<String>();
 	
-	ContentBuilder(Router router, File targetDir) {
+	ContentBuilder(RuntimeContext runtimeContext, Router router) {
 		this.router = router;
-		this.targetDir = targetDir;
+		this.targetDir = runtimeContext.getTargetDirectory();
 	}
 	
 	void buildFromRootFile() throws IOException, ScriptException {
