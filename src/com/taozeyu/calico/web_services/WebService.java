@@ -1,5 +1,6 @@
 package com.taozeyu.calico.web_services;
 
+import com.sun.javafx.scene.shape.PathUtils;
 import com.taozeyu.calico.RuntimeContext;
 import com.taozeyu.calico.generator.PageService;
 import com.taozeyu.calico.generator.Router;
@@ -101,12 +102,44 @@ public class WebService extends NanoHTTPD {
     }
 
     private Response generateResourceResponse(String path) throws FileNotFoundException {
-        if (!router.existAsset(path)) {
-            return getErrorMessageResponse(NOT_FOUND, "404 Resource Not Found:"+ path);
+        InputStream inputStream = null;
+
+        if (router.existAssetAsEntity(path)) {
+            inputStream = router.getAsset(path);
+
+        } else if (isPathAllowedInTarget(path)) {
+            File targetDirectory = runtimeContext.getTargetDirectory();
+            File assetFile = new File(targetDirectory, path);
+            if (assetFile.exists() && assetFile.isFile()) {
+                inputStream = new FileInputStream(assetFile);
+            }
         }
-        String contentType = getContentTypeByExtensionName(PathUtil.getExtensionName(path));
-        InputStream is = new BufferedInputStream(router.getAsset(path), 1024);
-        return new Response(OK, contentType, is);
+        if (inputStream != null) {
+            String contentType = getContentTypeByExtensionName(PathUtil.getExtensionName(path));
+            inputStream = new BufferedInputStream(inputStream, 1024);
+            return new Response(OK, contentType, inputStream);
+        }
+        return getErrorMessageResponse(NOT_FOUND, "404 Resource Not Found:"+ path);
+    }
+
+    private boolean isPathAllowedInTarget(String path) {
+        String[] pathComponents = PathUtil.splitComponents(path);
+        for (String linkedPath : runtimeContext.getResourceAssetsPath()) {
+            String[] linkedComponents = PathUtil.splitComponents(linkedPath);
+            if (linkedComponents.length <= pathComponents.length) {
+                boolean match = true;
+                for (int i = 0; i< linkedComponents.length; i ++) {
+                    if (!pathComponents[i].equals(linkedComponents[i])) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private Response getErrorMessageResponse(Response.IStatus state, String errorMessage) {

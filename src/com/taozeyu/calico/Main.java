@@ -10,6 +10,7 @@ import com.taozeyu.calico.resource.ResourceManager;
 import com.taozeyu.calico.script.ScriptContext;
 import com.taozeyu.calico.util.PathUtil;
 import com.taozeyu.calico.web_services.WebService;
+import jdk.nashorn.api.scripting.ScriptUtils;
 
 import javax.script.ScriptException;
 
@@ -91,6 +92,8 @@ public class Main {
                 .eval("__calico_configuration.value_of_string('resource_directory')");
         String rootPage = (String) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_string('root_page')");
+        String[] resourceAssetsPath = (String[]) initScriptContext.engine()
+                .eval("__calico_configuration.value_of_array('linked_resource_assets_path')");
         int port = (int) ((Double) initScriptContext.engine()
                 .eval("__calico_configuration.value_of_integer('port')")).doubleValue();
 
@@ -98,6 +101,7 @@ public class Main {
         runtimeContext.setTargetDirectory(getDirectoryWithPath(targetDirectory));
         runtimeContext.setResourceDirectory(getDirectoryWithPath(resourceDirectory));
         runtimeContext.setRootPage(rootPage);
+        runtimeContext.setResourceAssetsPath(resourceAssetsPath);
         runtimeContext.setPort(port);
 
         return runtimeContext;

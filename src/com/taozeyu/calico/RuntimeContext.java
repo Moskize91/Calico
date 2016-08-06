@@ -15,6 +15,7 @@ public class RuntimeContext {
     private File resourceDirectory;
     private File systemEntityDirectory;
     private String rootPage;
+    private String[] resourceAssetsPath;
     private Pattern ignoreCopy;
     private Pattern ignoreClean;
     private Map<String, File> libraryDirectoryMap;
@@ -67,12 +68,12 @@ public class RuntimeContext {
         this.rootPage = rootPage;
     }
 
-    public Map<String, File> getLibraryDirectoryMap() {
-        return libraryDirectoryMap;
+    public String[] getResourceAssetsPath() {
+        return resourceAssetsPath;
     }
 
-    public void setLibraryDirectoryMap(Map<String, File> libraryDirectoryMap) {
-        this.libraryDirectoryMap = libraryDirectoryMap;
+    public void setResourceAssetsPath(String[] resourceAssetsPath) {
+        this.resourceAssetsPath = resourceAssetsPath;
     }
 
     public Pattern getIgnoreCopy() {
@@ -89,5 +90,13 @@ public class RuntimeContext {
 
     public void setIgnoreClean(Pattern ignoreClean) {
         this.ignoreClean = ignoreClean;
+    }
+
+    public Map<String, File> getLibraryDirectoryMap() {
+        return libraryDirectoryMap;
+    }
+
+    public void setLibraryDirectoryMap(Map<String, File> libraryDirectoryMap) {
+        this.libraryDirectoryMap = libraryDirectoryMap;
     }
 }

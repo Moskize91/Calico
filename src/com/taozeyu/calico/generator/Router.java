@@ -35,7 +35,7 @@ public class Router {
 		);
 	}
 
-	public boolean existAsset(String relativePath) {
+	public boolean existAssetAsEntity(String relativePath) {
 		return assetEntity.entityExist(relativePath);
 	}
 
