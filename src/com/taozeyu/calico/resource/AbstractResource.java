@@ -9,7 +9,7 @@ import java.io.Reader;
 /**
  * Created by taozeyu on 15/10/9.
  */
-abstract class AbstractResource<CONTENT> extends ResourceFileWithHead {
+abstract class AbstractResource<CONTENT> extends ResourceFileWithMetaData {
 
     private final String resourcePath;
     private CONTENT contentCache;

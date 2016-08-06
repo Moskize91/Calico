@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ResourceFileWithHead {
+public class ResourceFileWithMetaData {
 
 	private static final Pattern HeadLinePattern = Pattern.compile("^(\\w|\\-)+\\s*:\\s*.+\\s*$");
 	private static final int ReadAttributeBufferedSize = 128;
@@ -25,7 +25,7 @@ public class ResourceFileWithHead {
 	
 	private Map<String, String> attributeMap = null;
 	
-	ResourceFileWithHead(File resourceFile) {
+	ResourceFileWithMetaData(File resourceFile) {
 		this.resourceFile = resourceFile;
 	}
 
