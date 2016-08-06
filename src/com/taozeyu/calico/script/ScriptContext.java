@@ -100,12 +100,12 @@ public class ScriptContext {
     }
 
     public Object loadScriptFile(InputStream inputStream) throws ScriptException {
-        String head = "var __require_module = {};\n" +
-                      "var __result = (function(require, M) {" +
-                      "var __require_module = undefined;\n";
-        String footer = "\n}) (__require, __require_module);\n" +
-                        "if (__result !== undefined && __result !== null) { __require_module = __result } \n" +
-                        "__require_module;";
+        String head = "var __require_exports = {};\n" +
+                      "var __result = (function(require, exports) {" +
+                      "var __require_exports = undefined;\n";
+        String footer = "\n}) (__require, __require_exports);\n" +
+                        "if (__result !== undefined && __result !== null) { __require_exports = __result } \n" +
+                        "__require_exports;";
         return loadScriptFile(inputStream, head, footer);
     }
 
@@ -124,7 +124,7 @@ public class ScriptContext {
             head += "var __" + paramName + " = undefined;\n";
         }
         head += "var __require = undefined;" + // mask for user's code.
-                "var __require_module = undefined;" + // mask for user's code.
+                "var __require_exports = undefined;" + // mask for user's code.
                 "var __script_context = undefined;\n"; // mask for user's code.
         return engine.eval(head + viewContent + footer);
     }
@@ -136,7 +136,7 @@ public class ScriptContext {
 
     public Object loadScriptFile(Reader reader, String head, String footer) throws ScriptException {
         head += "var __require = undefined;" + // mask for user's code.
-                "var __require_module = undefined;" + // mask for user's code.
+                "var __require_exports = undefined;" + // mask for user's code.
                 "var __script_context = undefined;\n"; // mask for user's code.
         reader = new WrapReader(reader, head, footer);
         return engine.eval(reader);

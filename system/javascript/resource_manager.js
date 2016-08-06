@@ -58,4 +58,4 @@ var wrap = function(resource) {
     }
     return R;
 };
-M.generate_R = wrap;
+exports.generate_R = wrap;

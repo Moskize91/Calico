@@ -1,6 +1,6 @@
 // calico system library
 
-M.Configuration = function() {
+exports.Configuration = function() {
     this.configure = {
         port                : 8080,
         template_directory  : "./template",
@@ -10,14 +10,14 @@ M.Configuration = function() {
     };
 };
 
-M.Configuration.prototype.value_of_string = function(name) {
+exports.Configuration.prototype.value_of_string = function(name) {
     if (!this.configure[name]) {
         return null;
     }
     return "" + this.configure[name];
 };
 
-M.Configuration.prototype.value_of_integer = function(name) {
+exports.Configuration.prototype.value_of_integer = function(name) {
     if (!this.configure[name]) {
         return 0;
     }

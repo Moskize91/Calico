@@ -1,3 +1,3 @@
 // calico system library
 
-M.Session = function() {};
+exports.Session = function() {};
