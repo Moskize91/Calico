@@ -38,14 +38,16 @@ public class ResourceFileCopier {
 
     private void copyAllFile(File searchRootDir, String relativePath) throws IOException {
         File searchFile = new File(searchRootDir, relativePath);
-        if (searchFile.isDirectory()) {
-            for (String childFileName : searchFile.list()) {
-                copyAllFile(searchRootDir, relativePath +"/"+ childFileName);
-            }
-        } else {
-            if (fileSouldBeCopied(searchFile)) {
-                System.out.println("copy file " + relativePath);
-                copyFile(searchFile, new File(runtimeContext.getTargetDirectory(), relativePath));
+        if (searchFile.exists()) {
+            if (searchFile.isDirectory()) {
+                for (String childFileName : searchFile.list()) {
+                    copyAllFile(searchRootDir, relativePath +"/"+ childFileName);
+                }
+            } else {
+                if (fileSouldBeCopied(searchFile)) {
+                    System.out.println("copy file " + relativePath);
+                    copyFile(searchFile, new File(runtimeContext.getTargetDirectory(), relativePath));
+                }
             }
         }
     }
