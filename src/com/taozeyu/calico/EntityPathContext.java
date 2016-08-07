@@ -11,6 +11,29 @@ import java.util.*;
  */
 public class EntityPathContext {
 
+    private static final Set<String> jarSystemDirectories = findJarSystemDirectories();
+
+    private static Set<String> findJarSystemDirectories() {
+        String structPath = "/system/STRUCT";
+        if (EntityPathContext.class.getResource(structPath) == null) {
+            // not running in jar file.
+            return Collections.EMPTY_SET;
+        }
+        try (InputStream inputStream = EntityPathContext.class.getResourceAsStream(structPath);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))
+        ) {
+            LinkedHashSet<String> directories = new LinkedHashSet<>();
+            directories.add("/system");
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                directories.add("/system"+ line);
+            }
+            return directories;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final RuntimeContext runtimeContext;
     private final EntityType entityType;
     private final EntityModule entityModule;
@@ -73,11 +96,9 @@ public class EntityPathContext {
         ContextResult contextResult = findFileAndParentContext(path);
         EntityPathContext context = contextResult.getContext();
         String fileName = contextResult.getFileName();
-        if (context.entityModule == EntityModule.SystemLibrary &&
-                context.moduleDirectory == null) {
-            path = context.absolutionPath + "/" + fileName;
-            ClassLoader loader = getClass().getClassLoader();
-            return loader.getResource(path) != null;
+        if (context.entityModule == EntityModule.SystemLibrary && isDirectoryInJar(context.moduleDirectory)) {
+            path = "/system/" + context.entityType.getDirectoryName() + "/" + fileName;
+            return getClass().getResource(path) != null;
         } else {
             File pathRelativeModuleDirectory = new File(context.absolutionPath, fileName);
             File file = new File(context.moduleDirectory, pathRelativeModuleDirectory.getPath());
@@ -89,8 +110,7 @@ public class EntityPathContext {
         ContextResult contextResult = findFileAndParentContext(path);
         EntityPathContext context = contextResult.getContext();
         String fileName = contextResult.getFileName();
-        if (context.entityModule == EntityModule.SystemLibrary &&
-                context.moduleDirectory == null) {
+        if (context.entityModule == EntityModule.SystemLibrary && isDirectoryInJar(context.moduleDirectory)) {
             return null;
         } else {
             return new File(context.moduleDirectory, fileName);
@@ -102,13 +122,11 @@ public class EntityPathContext {
         EntityPathContext context = contextResult.getContext();
         String fileName = contextResult.getFileName();
 
-        if (context.entityModule == EntityModule.SystemLibrary &&
-            context.moduleDirectory == null) {
+        if (context.entityModule == EntityModule.SystemLibrary && isDirectoryInJar(context.moduleDirectory)) {
             String parentPath = context.absolutionPath;
             parentPath = parentPath.replaceAll("/$", "");
-            path = parentPath + "/" + fileName;
-            ClassLoader loader = getClass().getClassLoader();
-            return loader.getResourceAsStream(path);
+            path = "/system/"+ context.entityType.getDirectoryName() + parentPath + "/" + fileName;
+            return getClass().getResourceAsStream(path);
         } else {
             File pathRelativeModuleDirectory = new File(context.absolutionPath, fileName);
             File file = new File(context.moduleDirectory, pathRelativeModuleDirectory.getPath());
@@ -163,10 +181,10 @@ public class EntityPathContext {
             module = EntityModule.Template;
             targetModuleDirectory = runtimeContext.getTemplateDirectory();
         }
-        if (moduleDirectory == null) {
+        if (isDirectoryInJar(moduleDirectory)) {
             return null;
         }
-        if (existDirectory(absolutePath, entityModule, targetModuleDirectory)) {
+        if (existDirectory(absolutePath, module, targetModuleDirectory)) {
             components = Arrays.copyOfRange(components, 0, components.length);
         } else {
             components = Arrays.copyOfRange(components, 0, components.length - 1);
@@ -186,14 +204,20 @@ public class EntityPathContext {
     }
 
     private boolean existDirectory(String absolutionPath, EntityModule module, File moduleDirectory) {
-        if (module == EntityModule.SystemLibrary && moduleDirectory == null) {
-            //TODO check directory exist in JAR file.
-            return false;
+        if (module == EntityModule.SystemLibrary && isDirectoryInJar(moduleDirectory)) {
+            return jarSystemDirectories.contains(absolutionPath);
         } else {
             File directory = new File(moduleDirectory.getAbsolutePath(),
                                       entityType.getDirectoryName() + absolutionPath);
             return directory.exists() && directory.isDirectory();
         }
+    }
+
+    private boolean isDirectoryInJar(File directory) {
+        if (directory == null) {
+            return true; // null default in jar.
+        }
+        return directory.getPath().startsWith("/jar:file:");
     }
 
     public static class ContextResult {
