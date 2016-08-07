@@ -1,0 +1,3 @@
+#!/bin/sh
+./build_system_struct.sh
+ant build

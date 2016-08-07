@@ -4,7 +4,7 @@ CALICO_JAR_FILE_NAME="Calico-debug.jar"
 
 #check build builded?
 if [[ ! -f "$PWD/release/$CALICO_JAR_FILE_NAME" ]]; then
-    echo "calico has bean not build, please run 'ant build' first."
+    echo "calico has bean not build, please run `./build` first."
     exit 1
 fi
 
