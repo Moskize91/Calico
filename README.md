@@ -2,34 +2,146 @@ Calico
 ======
 ![master branch](https://travis-ci.org/Moskize91/Calico.svg?branch=master)
 
-这个程序将用于生成静态 HTML 页面。目前想用其生成一个博客这种程度的页面。博客中的文章（Resource）可以用 Markdown 写，也可以直接写成 HTML。这些文章将由模板（Template）读出，并生成最终的 HTML 页面。
+Calico 可以根据预设的规则，通过一个模板和一个资料库，生成一个静态 Web 站点所需的 Html 文件。Calico 会假装自己是一个动态服务器。对 Calico 的规则和模板都是通过假装 Calico 是动态服务器来确立的。
 
-作者：[moskize](http://taozeyu.com)
+# Calico 的工作原理
 
-# 原理
+具体来说，当 Calico 收到一个 Request，它会解析 Request 的 URL，并通过路由规则匹配到一个模板 View。并通过模板 View 构造 html 页面。模板 View 中可以嵌套用 JavaScript 写成的小脚本，这些小脚本会通过 Request 的参数（从 URL 解析得来）来获取对应的资源，这些资源可以是其他 html 页面，也可以是 markdown 文件，甚至是 json 文件。读取的资源会通过小脚本嵌套再模板 View 最终渲染出的 html 页面中。最终，这个 html 页面作为一个 Response 被返回。
 
-Calico 会假装自己是一个动态 Web 服务器，虽然它最终只能生成静态页面。如图所示，为 Calico 处理一个请求的流程。
+但 Calico 终究不是一个动态 Web 服务器。实际上，Calico 仅仅只能一次性生成一个 Web 站点所需的所有 html 文件。它是这样工作的。
 
-![Calico如何工作](https://cloud.githubusercontent.com/assets/6957148/5595888/e8f8ed3a-92b9-11e4-9963-a6bc39623f8a.jpg)
+首先，Calico 会挑选一组种子地址，默认是 “``/``” 这个根地址。之后，请求这些种子地址，并渲染出 html 页面。之后在 html 页面中寻找所有指向站内的 URL，再以这些 URL 发起请求渲染更多的 html 页面。这个过程会递归地进行下去，直到找不到更多的指向站内的 URL 地址为止。
 
-1.	Routes 会将一个地址映射到一个 Template 文件上。例如，对于 /article/log/2015-01-02-hello-world.html ，如果存在存储路径为 /article/log.html 的 Temlate（模板）文件，则 Routes 会将 2015-01-02-hello-world 作为参数，并将这个请求交由 /article/log.html 处理。
+这一过程的原理类似爬虫。这样便可保证 Calico 生成的那一堆 html 文件，里面的任何一个指向站内的 URL 都是可以打开的。之后，我们只需要把 Calico 生成的所有文件发布到某个静态 Web 站点即可。
 
-	Routes 规则仅仅由 Template 文件的命名和相对项目的路径来决定。
+# 安装
 
-	特别的，如果对于某个请求，刚好有一个路径和名称与之完全相同的 Template 文件存在，则这个 Template 将处理这个请求。例如，对于 /about.html，刚好存在一个 Template文件，为 /about.html。
+Calico 目前只支持 Unix/Linux/macOS 平台。
+请确保安装了 git、ant、JDK1.8。
 
-2.	Template 中内嵌的用 JavaScript 的小脚本与 HTML 内容将最终生成目标 HTML 文件。这个目标文件所存储的地址将和请求的地址完全相同。例如，/article/log/2015-01-02-hello-world.html 最终生成的文件也会存储在 /article/log/2015-01-02-hello-world.html。
+首先，你需要挑选一个 Calico 所安装的目标文件夹，用 Terminal 切换到该文件夹下。然后运行下面这两行命令的任意一行，来 clone 整个项目。
 
-3.	Tempalte 中的 JavaScript 小脚本可以读取 Resource（资源），利用 Routes 传来的参数，取出对应的资源。这些资源对于博客而言就是博客里的每一篇文章，这些文章可以写成 Markdown 格式，也可以写成 HTML。每一个文件对应一个资源。可以用 JavaScript 代码取出，如：
-R.page("log/2015-01-02-hello-world"); 
+- ``git clone git@github.com:Moskize91/Calico.git``
+- ``git clone https://github.com/Moskize91/Calico.git``
 
-当定义好 Template 文件和 Resource 文件之后，就可以开始生成网页了。
+之后，输入 ``cd Calico``。
 
-但是，Calico 毕竟不是一个动态 Web 服务器。在生成网站之前，Calico 需要知道根地址对应的 Tempalte 文件是哪一个，这需要在启动的时候告诉它。随后，它将生成根页面。
+进入项目文件夹之后，请输入 ``./build`` 来构造整个项目。当你看到……
 
-之后，Calico 会读取页面上所有链接指向的 URL 地址，如果地址指向本站，则它会试图用这些地址向 Routes 发出请求，继续生成新的页面。之后再从生成的新页面读取链接重新发出请求，直到遍历完整个网站，找不到新的页面需要生成为止。
+```
+BUILD SUCCESSFUL
+Total time: 2 seconds
+```
 
-整个过程很像爬虫，但这样能确保生成的所有页面的链接都是可以点开的。
+的字样，说明 Calico 构造成功。否则，请确认你已经安装了 ant 和 JDK1.8。
+
+之后，输入 ``./install`` 安装 Calico。
+
+其中可能需要你输入 sudo 密码，输入即可。看到
+
+```
+Success.
+```
+的字样，说明 Calico 安装成功。
+
+# 第一个 Calico 模板
+
+对于 Calico 而言，模板＋资源＝站点。
+我们先写一个最简单的的，不需要任何资源就可以使用的模板吧。
+
+```
+mkdir example
+cd example
+```
+
+新建一个名为 example 的空文件夹，作为我们的模板文件夹。然后……
+
+```
+mkdir view
+```
+
+这个名为 view 的文件夹是专门存放模板 View 的。之后……
+
+```
+vim ./view/main.html
+```
+
+然后按下 ``i`` 输入……
+
+```
+<html>
+     <body>hello world.</body>
+ </html>
+```
+然后按下 ``ESC`` 再输入 ``:wq`` 并回车保存退出。
+确保此时你处于 ``example`` 这个文件夹之中。
+
+最后，输入如下命令以 service 模式启动 Calico……
+
+```
+calico service
+```
+
+当你看到
+
+```
+Running! Point your browser to http://127.0.0.1:8080/ 
+```
+
+表明 Calico 启动成功，此时，使用浏览器访问 [127.0.0.1:8080](http://127.0.0.1:8080/)，就可以看到我们的 hello world 页面了。
+
+> ##service 模式
+>
+> Calico 以这种模式运行时，会在本地监听特定的端口（默认 8080 ）。使用浏览器通过这个端口，可以直接与 Calico 交互。此时 Calico 就像一个动态 Web 服务器一样，针对浏览器的每一次 Request 仅仅生成一个 Response。
+>
+> 在本地以这种模式执行 Calico，有助于调试你的模板。你对模板中的 View 文件，或 JavaScript 脚本文件，或资源文件进行修改之后，只需要刷新一下浏览器，便可立即看到修改之后的效果。
+
+按下 ``Ctrl + C `` 结束 Calico 的 service 模式。
+
+之后，我们尝试使用 build 模式执行 Calico。
+
+首先确保你处于 ``example`` 文件夹中，输入 ``ls``，此时你应该看到……
+
+```
+view
+```
+
+仅有一个 view 文件夹，这就是我们刚才新建的。然后，输入如下命令并执行。
+
+```
+calico build
+```
+看到……
+
+```
+Clean target directory: /Users/taozeyu/test/example/target
+	 delete file /Users/taozeyu/test/example/target
+
+Copy resource files
+
+Generate html pages.
+	generate path /
+```
+表明执行成功了，此时输入 ``ls``，可以看到……
+
+```
+target view
+```
+多出一个 target 文件夹，这是 Calico 生成的。
+
+我们使用 ``ls target`` 查看这个文件夹里面的文件。可以看到……
+
+```
+index.html
+```
+我们使用浏览器打开这个文件，可以看到浏览器中显示……
+> hello world
+
+这正是 Calico 使用我们的模板 View 生成的目标 html 文件。
+
+> ## build 模式
+>
+> Calico 以这种模式执行时，会在从种子地址开始，递归地生成所有的可能的 html 文件。每当它产生一个 html 文件，它便立即搜集这个 html 中每一个指向站内的 URL，并通过这些 URL 继续生成更多的 html 文件。直到没有更多的 html 文件可以生成为止。
 
 # 使用的库：
 
