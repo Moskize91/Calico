@@ -3,12 +3,12 @@
 exports.Configuration = function() {
     this.configure = {
         port                        : 8080,
-        template_directory          : "./template",
+        template_directory          : "./",
         target_directory            : "./target",
-        resource_directory          : "./",
-        root_page                   : "/index.html",
+        resource_directory          : "./resource",
+        root_page                   : "/main.html",
         seeds                       : ["/"],
-        linked_resource_assets_path : "[]",
+        linked_resource_assets_path : [],
         ignore_copy                 : /$^/,
         ignore_clean                : /.*\.git\/.*/,
         redirect                    : {},
